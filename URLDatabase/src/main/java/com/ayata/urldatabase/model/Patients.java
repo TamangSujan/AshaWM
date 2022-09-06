@@ -8,10 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-@Document
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Document(value = "patients")
 public class Patients{
     @Id
     private String _id;

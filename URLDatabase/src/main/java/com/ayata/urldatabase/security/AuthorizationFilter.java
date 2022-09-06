@@ -14,7 +14,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public class AuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/api/asha/database/loginUser")){
+        if(request.getServletPath().equals("/api/loginUser") || request.getServletPath().equals("/api/addUser")){
             filterChain.doFilter(request, response);
         }else{
             String header = request.getHeader(HttpHeaders.AUTHORIZATION);

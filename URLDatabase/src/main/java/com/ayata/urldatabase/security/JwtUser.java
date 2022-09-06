@@ -21,8 +21,8 @@ public class JwtUser implements UserDetailsService {
     private BCryptPasswordEncoder encoder;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = userRepository.getUser(username);
+        Users user = userRepository.findByPhone(username);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        return new User(user.getPhone(), encoder.encode(user.getPassword()), authorities);
+        return new User(user.getPhone(), user.getPassword(), authorities);
     }
 }

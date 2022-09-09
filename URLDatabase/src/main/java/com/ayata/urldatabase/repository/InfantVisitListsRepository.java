@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.repository;
 
-import com.ayata.urldatabase.model.InfantVisitLists;
+import com.ayata.urldatabase.model.database.InfantVisitLists;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

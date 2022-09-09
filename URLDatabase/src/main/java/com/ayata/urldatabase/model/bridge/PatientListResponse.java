@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.model.bridge;
 
-import com.ayata.urldatabase.model.Patients;
+import com.ayata.urldatabase.model.database.Patients;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

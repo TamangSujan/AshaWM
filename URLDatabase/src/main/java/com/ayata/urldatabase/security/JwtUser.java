@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.security;
 
-import com.ayata.urldatabase.model.Users;
+import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 public class JwtUser implements UserDetailsService {
     private UserRepository userRepository;
-    private BCryptPasswordEncoder encoder;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Users user = userRepository.findByPhone(username);

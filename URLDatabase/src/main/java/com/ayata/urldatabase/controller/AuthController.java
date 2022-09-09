@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.controller;
 
-import com.ayata.urldatabase.model.Users;
+import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.services.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;

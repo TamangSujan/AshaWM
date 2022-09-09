@@ -1,9 +1,8 @@
 package com.ayata.urldatabase.services;
 
-import com.ayata.urldatabase.model.Users;
+import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

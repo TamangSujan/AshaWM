@@ -1,7 +1,7 @@
 package com.ayata.urldatabase.routes;
 
 import com.ayata.urldatabase.controller.AuthController;
-import com.ayata.urldatabase.model.Users;
+import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.model.token.UsernamePassword;

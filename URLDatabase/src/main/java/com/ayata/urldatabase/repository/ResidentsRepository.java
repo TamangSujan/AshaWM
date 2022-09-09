@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.repository;
 
-import com.ayata.urldatabase.model.Residents;
+import com.ayata.urldatabase.model.database.Residents;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

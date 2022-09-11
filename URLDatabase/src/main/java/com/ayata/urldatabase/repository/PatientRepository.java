@@ -18,4 +18,7 @@ public interface PatientRepository extends MongoRepository<Patients, String> {
             "{$skip: ?1}",
             "{$limit: ?0}"})
     public List<Patients> getLimitPatient(int perPage, int currentPage);
+
+    @Aggregation(pipeline = {"{$match: {'patientPhone': {$in: ?0}}}"})
+    public List<Patients> matchedPhoneList(List<String> patients);
 }

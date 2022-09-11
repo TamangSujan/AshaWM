@@ -11,5 +11,5 @@ public class ResponseDetails {
     private String code;
     private String status;
     private String message;
-    private Object data;
+    private Object details;
 }

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class VisitLists{
     @Id
     private String _id;
-    private ArrayList<Visit> visit;
+    private Object visit;
     private String user_id;
     private String patientId;
     private String __v;

@@ -1,35 +1,33 @@
-package com.ayata.urldatabase.routes;
+package com.ayata.urldatabase.routes.mobile;
 
 import com.ayata.urldatabase.controller.AuthController;
 import com.ayata.urldatabase.model.bridge.ForgotPassword;
+import com.ayata.urldatabase.model.bridge.ResponseDetailsV2;
+import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.bridge.UpdateProfile;
 import com.ayata.urldatabase.model.database.Users;
-import com.ayata.urldatabase.model.bridge.ResponseMessage;
-import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.model.token.UsernamePassword;
 import com.ayata.urldatabase.model.token.UsernameToken;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.security.Jwt;
-import com.ayata.urldatabase.security.JwtUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/v2/mobile")
 @AllArgsConstructor
-@RequestMapping("/api")
-public class URLAuth {
+public class MobileURLAuth {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private AuthController authController;
-    private BCryptPasswordEncoder encoder;
-    private JwtUser userDetails;
-    @PostMapping("/loginUser")
-    public ResponseEntity loginUser(@RequestBody UsernamePassword usernamePassword){
+
+    @PostMapping(value = "/loginUser", consumes = {"application/x-www-form-urlencoded"})
+    public ResponseEntity loginUser(UsernamePassword usernamePassword){
         if(usernamePassword.getPhone().equals("") || usernamePassword.getPassword().equals("")){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Field Should Not Be Empty"));
         }
@@ -39,7 +37,8 @@ public class URLAuth {
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
         String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser");
-        return ResponseEntity.status(HttpStatus.OK).body(new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), access_token));
+        ResponseDetailsV2 response = new ResponseDetailsV2("200", "success", new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), access_token));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/addUser")
@@ -71,10 +70,5 @@ public class URLAuth {
         user.setImage(updateProfile.getChw_image());
         userRepository.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<?> getTest(){
-        return ResponseEntity.status(HttpStatus.OK).body(new Message("Am i authenticated and authorized?"));
     }
 }

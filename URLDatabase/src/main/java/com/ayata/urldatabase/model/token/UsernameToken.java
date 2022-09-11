@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsernameToken {
-    private String username;
-    private String access_token;
+    private Integer chw_id;
+    private String chw_name;
+    private String chw_gender;
+    private String chw_dob;
+    private String token;
 }

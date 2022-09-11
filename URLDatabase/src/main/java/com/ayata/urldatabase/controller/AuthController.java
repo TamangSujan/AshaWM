@@ -16,9 +16,21 @@ public class AuthController {
         if(!isNepalesePhoneNumber(phone)){
             return "Please provide a valid number!";
         }
-        return authService.createUser(phone, password);
+        return authService.createUser(phone.substring(4), password);
     }
 
+    public String forgotPassword(String phone, String password, String confirmPassword){
+        if(isEmptyPhone(phone) || isEmptyPassword(password)){
+            return "Fields should not be empty!";
+        }
+        if(!isNepalesePhoneNumber(phone)){
+            return "Please provide a valid number!";
+        }
+        if(password.equals(confirmPassword)){
+            return authService.changePassword(phone, confirmPassword);
+        }
+        return "Error";
+    }
     private boolean isEmptyPhone(String phone){
         if(phone.equals("")){
             return true;

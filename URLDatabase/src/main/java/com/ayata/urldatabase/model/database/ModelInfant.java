@@ -12,6 +12,9 @@ import java.util.ArrayList;
 public class ModelInfant{
     private String infantAddedDate;
     private String infantAge;
+    private int infantAgeInDays;
+    private int infantAgeInMonth;
+    private int infantAgeInYear;
     private String infantDobEnglish;
     private String infantDobNepali;
     private String infantFirstName;
@@ -24,6 +27,8 @@ public class ModelInfant{
     private String infantVillagename;
     private String infantmotherfirstname;
     private String infantmotherlastname;
-    private String infantwardno;
-    private ArrayList<ModelVisitList> modelVisitList;
+    private int infantwardno;
+    private double latitude;
+    private double longitude;
+    private Object modelVisitList;
 }

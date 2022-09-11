@@ -20,7 +20,7 @@ public class Patients{
     @JsonIgnore
     private String user;
 
-    private Date patientAddedDate;
+    private String patientAddedDate;
     @JsonIgnore
     private String patientAge;
     @JsonIgnore
@@ -50,7 +50,7 @@ public class Patients{
     @JsonIgnore
     private String patientspouselastname;
     @JsonIgnore
-    private String patientwardno;
+    private Integer patientwardno;
 
     private String image;
     @JsonIgnore

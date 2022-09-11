@@ -1,5 +1,6 @@
 package com.ayata.urldatabase.model.database;
 
+import com.ayata.urldatabase.model.bridge.ResidentOnly;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-@JsonRootName("cencusList")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +24,16 @@ public class Residents{
     private ResidentDetailFinal residentDetailFinal;
     private ResidentHead residentHead;
     private EnteredDateTime enteredDateTime;
+    public ResidentOnly getResidentOnly(){
+        ResidentOnly residentOnly = new ResidentOnly();
+        residentOnly.setResidentId(residentId);
+        residentOnly.setResidentAssignId(residentAssignId);
+        residentOnly.setResident(resident);
+        residentOnly.setResidentAddress(residentAddress);
+        residentOnly.setResidentDetail(residentDetail);
+        residentOnly.setResidentDetailFinal(residentDetailFinal);
+        residentOnly.setResidentHead(residentHead);
+        residentOnly.setEnteredDateTime(enteredDateTime);
+        return residentOnly;
+    }
 }

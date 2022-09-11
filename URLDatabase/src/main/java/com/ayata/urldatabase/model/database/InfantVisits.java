@@ -18,7 +18,7 @@ public class InfantVisits{
     @Id @JsonIgnore
     private String _id;
     @Field(value = "AppUserList")
-    private ArrayList<AppUserList> appUserList;
+    private ArrayList<InfantAppUserList> appUserList;
     @JsonIgnore
     private boolean synced;
     @JsonIgnore

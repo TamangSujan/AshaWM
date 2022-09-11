@@ -1,15 +1,15 @@
-package com.ayata.urldatabase.model.bridge;
+package com.ayata.urldatabase.model.database;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CheckCensusResponse {
+public class InfantAppUserList {
     private String appUserId;
-    private List<ResidentOnly> censusList;
+    private ArrayList<ModelInfant> modelInfants;
 }

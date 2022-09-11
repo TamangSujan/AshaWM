@@ -1,16 +1,22 @@
 package com.ayata.urldatabase.model.database;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Visits{
     @Id
-    public String _id;
+    private String _id;
     @Field(value = "AppUserList")
-    public ArrayList<AppUserList> appUserList;
-    public String user;
-    public boolean synced;
-    public String __v;
+    private ArrayList<AppUserList> appUserList;
+    private String user;
+    private boolean synced;
+    private String __v;
 }

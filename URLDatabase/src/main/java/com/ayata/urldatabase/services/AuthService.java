@@ -18,7 +18,7 @@ public class AuthService {
         }
         Users lastUser = userRepo.lastUser();
         user = new Users();
-        user.setChw_id(Integer.parseInt(lastUser.getChw_id())+1+"");
+        user.setChw_id(lastUser.getChw_id()+1);
         user.setPhone(phone);
         user.setPassword(encoder.encode(password));
         user.setChw_address("");

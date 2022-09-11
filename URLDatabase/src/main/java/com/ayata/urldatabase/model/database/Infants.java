@@ -27,11 +27,11 @@ public class Infants {
     private String infantVillagename;
     private String infantmotherfirstname;
     private String infantmotherlastname;
-    private String infantwardno;
+    private int infantwardno;
     private String __v;
     private boolean deleted;
-    private String infantAgeInDays;
-    private Integer infantAgeInMonth;
+    private int infantAgeInDays;
+    private int infantAgeInMonth;
     private String infantDobNepali;
     private String infantModifyDate;
 }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -36,8 +37,12 @@ public class URLCensus {
         }
         String appUserId = Library.splitAndGetFirst(residents.get(0), "_");
         List<Residents> checkResident = residentsRepository.findAllByUserIdExceptGivenList(appUserId, residents);
+        CheckCensusResponse response = new CheckCensusResponse(appUserId, new ArrayList<>());
+        for(Residents resident: checkResident){
+            response.getCensusList().add(resident.getResidentOnly());
+        }
         if(checkResident.size()>0){
-            return new ResponseEntity(new CheckCensusResponse(appUserId, checkResident), HttpStatus.OK);
+            return new ResponseEntity(response, HttpStatus.OK);
         }else{
             return ResponseEntity.status(HttpStatus.OK).body(new Message("No New Data"));
         }

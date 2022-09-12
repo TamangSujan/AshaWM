@@ -6,20 +6,22 @@ import com.ayata.urldatabase.repository.PatientRepository;
 import com.ayata.urldatabase.repository.VisitListsRepository;
 import com.ayata.urldatabase.repository.VisitsRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.bson.json.JsonObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
@@ -29,8 +31,10 @@ public class MobileURLVisit {
     private VisitsRepository visitsRepository;
     private VisitListsRepository visitListsRepository;
 
-    @PostMapping(value = "/addVisit")
-    public ResponseEntity<?> addVisit(@RequestBody AppUserList appUserList){
+    @PostMapping(value = "/addVisit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> addVisit(HttpServletRequest request) throws ServletException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        AppUserList appUserList = objectMapper.readValue(request.getParameter("json"), AppUserList.class);
         List<Patients> patients = new ArrayList<>();
         List<VisitLists> visitLists = new ArrayList<>();
         for(ModelPatientList modelPatientList: appUserList.getModelPatientList()){
@@ -74,17 +78,7 @@ public class MobileURLVisit {
                 }
             }
         }
-        /*
-        List<Patients> unmatchedPatient = patients.stream().
-                filter(patient->{
-                    for(Patients p: matchedPatient){
-                        if(patient.getPatientPhone()==p.getPatientPhone()){
-                            return true;
-                        }
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());*/
+
         patientRepository.saveAll(patients);
         visitListsRepository.saveAll(visitLists);
         Visits visit = new Visits();
@@ -93,6 +87,7 @@ public class MobileURLVisit {
         appList.add(appUserList);
         visit.setAppUserList(appList);
         visitsRepository.save(visit);
+
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 }

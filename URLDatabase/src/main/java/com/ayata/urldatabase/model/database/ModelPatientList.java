@@ -1,4 +1,5 @@
 package com.ayata.urldatabase.model.database;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ public class ModelPatientList{
     private String patientAge;
     private String patientDob;
     private String patientFirstName;
+    private String patientMiddleName;
     private String patientFullName;
     private String patientGender;
     private String patientHouseno;

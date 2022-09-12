@@ -12,5 +12,8 @@ public class UsernameToken {
     private String chw_name;
     private String chw_gender;
     private String chw_dob;
+    private String chw_address;
+    private String chw_designation;
+    private String image;
     private String token;
 }

@@ -27,7 +27,7 @@ public class AuthController {
             return "Please provide a valid number!";
         }
         if(password.equals(confirmPassword)){
-            return authService.changePassword(phone, confirmPassword);
+            return authService.changePassword(Integer.parseInt(phone), confirmPassword);
         }
         return "Error";
     }

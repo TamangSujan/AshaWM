@@ -21,7 +21,7 @@ public class URLCensus {
     private ResidentsRepository residentsRepository;
     @PostMapping("/addCensus")
     public ResponseEntity<?> addCensus(@RequestBody Residents residents){
-        Residents checkResident = residentsRepository.findByResidentId(residents.getResidentId());
+        Residents checkResident = residentsRepository.findByResidentId(residents.getResident_id());
         if(checkResident!=null){
             return new ResponseEntity(new ResponseMessage("403", "Failure", "Resident Exists"), HttpStatus.OK);
         }else{

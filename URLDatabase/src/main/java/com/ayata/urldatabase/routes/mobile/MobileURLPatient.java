@@ -1,11 +1,7 @@
 package com.ayata.urldatabase.routes.mobile;
 
-import com.ayata.urldatabase.model.bridge.CheckInfantResponse;
 import com.ayata.urldatabase.model.bridge.CheckVisitResponse;
-import com.ayata.urldatabase.model.database.AppUserList;
-import com.ayata.urldatabase.model.database.InfantAppUserList;
-import com.ayata.urldatabase.model.database.InfantVisits;
-import com.ayata.urldatabase.model.database.Visits;
+import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.repository.VisitsRepository;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
@@ -31,7 +27,7 @@ public class MobileURLPatient {
         CheckVisitResponse response = new CheckVisitResponse(user, new ArrayList<>());
         for(Visits visit: visits){
             for(AppUserList appUserList: visit.getAppUserList()){
-                response.getModelPatientList().add(appUserList.getModelPatientList());
+                response.getModelPatientList().add(appUserList.getModelPatientList().get(0));
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);

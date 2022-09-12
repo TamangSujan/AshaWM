@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResidentOnly {
-    private String residentId;
-    private String residentAssignId;
+    private String appuser_id;
+    private boolean isSync;
+    private String resident_id;
+    private String resident_assign_id;
     private Resident resident;
     private ResidentAddress residentAddress;
     private ResidentDetail residentDetail;

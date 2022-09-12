@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CheckVisitResponse {
     private String appUserId;
-    private List<List<ModelPatientList>> modelPatientList;
+    private List<ModelPatientList> modelPatientList;
 }
 

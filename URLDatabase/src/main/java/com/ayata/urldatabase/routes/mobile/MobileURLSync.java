@@ -1,5 +1,6 @@
 package com.ayata.urldatabase.routes.mobile;
 
+import com.ayata.urldatabase.model.bridge.AddSyncResponse;
 import com.ayata.urldatabase.model.bridge.ResponseDetails;
 import com.ayata.urldatabase.model.database.SyncHistories;
 import com.ayata.urldatabase.repository.SyncRepository;
@@ -25,5 +26,16 @@ public class MobileURLSync {
             details = new ResponseDetails("200", "success", "No data found under user "+id, list);
         }
         return ResponseEntity.status(HttpStatus.OK).body(details);
+    }
+
+    @PostMapping("/addSyncHistory")
+    public ResponseEntity<?> addSyncHistory(@RequestBody AddSyncResponse sync){
+        SyncHistories history = new SyncHistories();
+        history.setId(sync.getId());
+        history.setApp_user_id(sync.getApp_user_id());
+        history.setTime(sync.getTime());
+        history.setDate(sync.getDate());
+        syncRepository.save(history);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

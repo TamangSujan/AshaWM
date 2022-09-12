@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +26,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v2/mobile")
 public class MobileURLVisit {
     private PatientRepository patientRepository;
+    private VisitsRepository visitsRepository;
     private VisitListsRepository visitListsRepository;
 
-    @PostMapping("/addVisit")
+    @PostMapping(value = "/addVisit")
     public ResponseEntity<?> addVisit(@RequestBody AppUserList appUserList){
         List<Patients> patients = new ArrayList<>();
         List<VisitLists> visitLists = new ArrayList<>();
@@ -85,6 +87,12 @@ public class MobileURLVisit {
                 .collect(Collectors.toList());*/
         patientRepository.saveAll(patients);
         visitListsRepository.saveAll(visitLists);
+        Visits visit = new Visits();
+        visit.setUser(appUserList.getAppUserId());
+        ArrayList<AppUserList> appList = new ArrayList<>();
+        appList.add(appUserList);
+        visit.setAppUserList(appList);
+        visitsRepository.save(visit);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 }

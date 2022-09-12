@@ -39,7 +39,7 @@ public class URLAuth {
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
         String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser");
-        return ResponseEntity.status(HttpStatus.OK).body(new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), access_token));
+        return ResponseEntity.status(HttpStatus.OK).body(new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), dbUser.getChw_address(), dbUser.getChw_designation(), dbUser.getImage(), access_token));
     }
 
     @PostMapping("/addUser")
@@ -68,7 +68,7 @@ public class URLAuth {
         user.setChw_dob(updateProfile.getChw_dob());
         user.setChw_designation(updateProfile.getChw_designation());
         user.setChw_gender(updateProfile.getChw_gender());
-        user.setImage(updateProfile.getChw_image());
+        //user.setImage(updateProfile.getChw_image());
         userRepository.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }

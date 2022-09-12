@@ -37,7 +37,7 @@ public class AuthService {
         return "ok";
     }
 
-    public String updateUser(String chw_id, String chw_address, String chw_name,
+    public String updateUser(Integer chw_id, String chw_address, String chw_name,
                              String chw_dob, String chw_gender, String chw_designation,
                              String path){
         Users user = getUserByChwId(chw_id);
@@ -51,7 +51,7 @@ public class AuthService {
         return "ok";
     }
 
-    public String changePassword(String chw_id, String confirmPassword){
+    public String changePassword(Integer chw_id, String confirmPassword){
         Users user = getUserByChwId(chw_id);
         user.setPassword(encoder.encode(confirmPassword));
         userRepo.save(user);
@@ -62,7 +62,7 @@ public class AuthService {
         return userRepo.findByPhone(phone);
     }
 
-    private Users getUserByChwId(String chwId){
+    private Users getUserByChwId(Integer chwId){
         return userRepo.findByChwId(chwId);
     }
     private int totalUsers(){

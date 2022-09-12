@@ -15,9 +15,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Residents{
     @Id
     private String _id;
-    private String user;
-    private String residentId;
-    private String residentAssignId;
+    private String appuser_id;
+    private boolean isSync;
+    private String resident_id;
+    private String resident_assign_id;
     private Resident resident;
     private ResidentAddress residentAddress;
     private ResidentDetail residentDetail;
@@ -26,8 +27,10 @@ public class Residents{
     private EnteredDateTime enteredDateTime;
     public ResidentOnly getResidentOnly(){
         ResidentOnly residentOnly = new ResidentOnly();
-        residentOnly.setResidentId(residentId);
-        residentOnly.setResidentAssignId(residentAssignId);
+        residentOnly.setSync(isSync);
+        residentOnly.setAppuser_id(appuser_id);
+        residentOnly.setResident_id(resident_id);
+        residentOnly.setResident_assign_id(resident_assign_id);
         residentOnly.setResident(resident);
         residentOnly.setResidentAddress(residentAddress);
         residentOnly.setResidentDetail(residentDetail);

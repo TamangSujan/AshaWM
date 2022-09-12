@@ -10,10 +10,10 @@ public interface ResidentsRepository extends MongoRepository<Residents, String> 
     @Aggregation(pipeline = {"{$match: {'residentId': {$nin: ?0}}}"})
     public List<Residents> findAllExceptGivenList(List<String> residentId);
 
-    @Aggregation(pipeline = {"{$match: {'user': ?0}}"})
+    @Aggregation(pipeline = {"{$match: {'appuser_id': ?0}}"})
     public List<Residents> findAllByUserId(String userId);
 
-    @Aggregation(pipeline = {"{$match: {$and :[{'user': ?0}, {'residentId': {$nin: ?1}}]}}"})
+    @Aggregation(pipeline = {"{$match: {$and :[{'appuser_id': ?0}, {'residentId': {$nin: ?1}}]}}"})
     public List<Residents> findAllByUserIdExceptGivenList(String userId, List<String> residentId);
 
     @Aggregation(pipeline = {"{$match: {'residentId': ?0}}"})

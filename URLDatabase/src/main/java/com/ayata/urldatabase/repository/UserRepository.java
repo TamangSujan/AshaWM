@@ -9,7 +9,7 @@ public interface UserRepository extends MongoRepository<Users, String> {
     public Users findByPhone(String phone);
 
     @Aggregation(pipeline = "{$match : {'chw_id': ?0}}")
-    public Users findByChwId(String chw_id);
+    public Users findByChwId(Integer chw_id);
 
     @Aggregation(pipeline = "{$count: 'phone'}")
     public int totalUsers();

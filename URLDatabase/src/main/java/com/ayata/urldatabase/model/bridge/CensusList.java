@@ -11,8 +11,10 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 public class CensusList {
     @Id
+    private String _id;
     private String appuser_id;
     private EnteredDateTime entered_date_time;
+    private boolean isSync;
     private Resident resident;
     private ResidentAddress residentAddress;
     private ResidentDetail residentDetail;
@@ -23,9 +25,10 @@ public class CensusList {
 
     public Residents getNewResident(){
         Residents resident = new Residents();
-        resident.setUser(this.getAppuser_id());
-        resident.setResidentId(this.getResident_id());
-        resident.setResidentAssignId(this.getResident_assign_id());
+        resident.setAppuser_id(this.getAppuser_id());
+        resident.setSync(this.isSync());
+        resident.setResident_id(this.getResident_id());
+        resident.setResident_assign_id(this.getResident_assign_id());
         resident.setResident(this.getResident());
         resident.setResidentAddress(this.getResidentAddress());
         resident.setResidentDetail(this.getResidentDetail());

@@ -1,5 +1,7 @@
 package com.ayata.urldatabase.routes.mobile;
 
+import com.ayata.urldatabase.model.bridge.CensusRoot;
+import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.database.Residents;
 import com.ayata.urldatabase.model.bridge.CheckCensusResponse;
 import com.ayata.urldatabase.repository.ResidentsRepository;
@@ -29,5 +31,16 @@ public class MobileURLCensus {
             response.getCensusList().add(resident.getResidentOnly());
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/addCensus")
+    public ResponseEntity<?> addCensus(@RequestBody CensusRoot censusRoot){
+        Residents checkResident = residentsRepository.findByResidentId(censusRoot.censusList.get(0).getResident_id());
+        if(checkResident!=null){
+            return new ResponseEntity(new ResponseMessage("403", "Failure", "Resident Exists"), HttpStatus.OK);
+        }else{
+            residentsRepository.save(censusRoot.censusList.get(0).getNewResident());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Resident Added"));
+        }
     }
 }

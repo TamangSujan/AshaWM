@@ -84,6 +84,12 @@ public class MobileURLInfant {
                 .collect(Collectors.toList());*/
         infantsRepository.saveAll(infants);
         infantVisitListsRepository.saveAll(visitLists);
+        InfantVisits visit = new InfantVisits();
+        visit.setUser(appUserList.getAppUserId());
+        ArrayList<InfantAppUserList> appList = new ArrayList<>();
+        appList.add(appUserList);
+        visit.setAppUserList(appList);
+        infantVisitsRepository.save(visit);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 
@@ -94,7 +100,7 @@ public class MobileURLInfant {
         List<InfantVisits> visits = infantVisitsRepository.getInfantVisitExceptGivenList(user, list);
         for(InfantVisits infantVisit: visits){
             for(InfantAppUserList appUserList: infantVisit.getAppUserList()){
-                response.getModelInfantList().add(appUserList.getModelInfants());
+                response.getModelInfantList().add(appUserList.getModelInfants().get(0));
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);

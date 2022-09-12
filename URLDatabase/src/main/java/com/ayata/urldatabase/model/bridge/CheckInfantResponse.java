@@ -12,5 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class CheckInfantResponse {
     private String appUserId;
-    private List<List<ModelInfant>> modelInfantList;
+    private List<ModelInfant> modelInfantList;
 }

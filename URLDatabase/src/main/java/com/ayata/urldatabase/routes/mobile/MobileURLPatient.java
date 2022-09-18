@@ -2,6 +2,7 @@ package com.ayata.urldatabase.routes.mobile;
 
 import com.ayata.urldatabase.model.bridge.CheckVisitResponse;
 import com.ayata.urldatabase.model.database.*;
+import com.ayata.urldatabase.repository.VisitListsRepository;
 import com.ayata.urldatabase.repository.VisitsRepository;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
@@ -22,14 +23,19 @@ public class MobileURLPatient {
     private VisitsRepository visitsRepository;
     @PostMapping("/checkVisit")
     public ResponseEntity<?> checkVisits(@RequestBody List<String> list){
+        //logger.info("Inside Check Visit");
         String user = Library.splitAndGetFirst(list.get(0), "_");
         List<Visits> visits = visitsRepository.getVisitsExceptGivenList(user, list);
-        CheckVisitResponse response = new CheckVisitResponse(user, new ArrayList<>());
+        //List<VisitLists> visitLists = visitListsRepository.getVisitsExceptGivenList(user, list);/*
+        List<Object> patientLists = new ArrayList<>();
         for(Visits visit: visits){
-            for(AppUserList appUserList: visit.getAppUserList()){
-                response.getModelPatientList().add(appUserList.getModelPatientList().get(0));
+            for(AppUserList appUserList: visit.getAppUserList()) {
+                for(ModelPatientList modelPatientList: appUserList.getModelPatientList()){
+                    patientLists.add(modelPatientList);
+                }
             }
         }
+        CheckVisitResponse response = new CheckVisitResponse(user, patientLists);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

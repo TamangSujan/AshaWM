@@ -2,6 +2,7 @@ package com.ayata.urldatabase.routes.mobile;
 
 import com.ayata.urldatabase.model.bridge.AddSyncResponse;
 import com.ayata.urldatabase.model.bridge.ResponseDetails;
+import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.database.SyncHistories;
 import com.ayata.urldatabase.repository.SyncRepository;
 import lombok.AllArgsConstructor;
@@ -21,9 +22,9 @@ public class MobileURLSync {
         List<SyncHistories> list = syncRepository.getByUserId(id);
         ResponseDetails details;
         if(list.size()>0){
-            details = new ResponseDetails("200", "success", "Data found under user "+id, list);
+            details = new ResponseDetails(200, "success", "Data found under user "+id, list);
         }else{
-            details = new ResponseDetails("200", "success", "No data found under user "+id, list);
+            details = new ResponseDetails(200, "success", "No data found under user "+id, list);
         }
         return ResponseEntity.status(HttpStatus.OK).body(details);
     }
@@ -36,6 +37,6 @@ public class MobileURLSync {
         history.setTime(sync.getTime());
         history.setDate(sync.getDate());
         syncRepository.save(history);
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Synced"));
     }
 }

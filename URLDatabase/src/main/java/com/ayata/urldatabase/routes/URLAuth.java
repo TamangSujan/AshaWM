@@ -38,7 +38,7 @@ public class URLAuth {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "User Not Found"));
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
-        String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser");
+        String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser", true);
         return ResponseEntity.status(HttpStatus.OK).body(new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), dbUser.getChw_address(), dbUser.getChw_designation(), dbUser.getImage(), access_token));
     }
 

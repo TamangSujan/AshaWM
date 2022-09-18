@@ -1,5 +1,7 @@
 package com.ayata.urldatabase.model.database;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ModelVisitList{
     private EnteredDateTime entered_date_time;
     private ModelVisitSafe modelVisitSafe;
@@ -21,7 +24,7 @@ public class ModelVisitList{
     private String visit_lastdate_nepali;
     private double visit_latitude;
     private double visit_longitude;
-    private int ward;
+    private String ward;
     private boolean isSync;
     private ModelVisitChronic modelVisitChronic;
 }

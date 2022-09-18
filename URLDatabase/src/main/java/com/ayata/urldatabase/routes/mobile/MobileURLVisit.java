@@ -5,14 +5,10 @@ import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.repository.PatientRepository;
 import com.ayata.urldatabase.repository.VisitListsRepository;
 import com.ayata.urldatabase.repository.VisitsRepository;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.bson.json.JsonObject;
-import org.springframework.data.annotation.Id;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,9 +27,10 @@ public class MobileURLVisit {
     private VisitsRepository visitsRepository;
     private VisitListsRepository visitListsRepository;
 
-    @PostMapping(value = "/addVisit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/addVisit")
     public ResponseEntity<?> addVisit(HttpServletRequest request) throws ServletException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         AppUserList appUserList = objectMapper.readValue(request.getParameter("json"), AppUserList.class);
         List<Patients> patients = new ArrayList<>();
         List<VisitLists> visitLists = new ArrayList<>();
@@ -60,7 +57,7 @@ public class MobileURLVisit {
             patients.add(patient);
 
             VisitLists visitList = new VisitLists();
-            visitList.setVisit((ArrayList<Object>) modelPatientList.getModelVisitList());
+            visitList.setVisit(modelPatientList.getModelVisitList());
             visitList.setPatientId(patient.getPatientId());
             visitList.setUser_id(patient.getUser());
             visitLists.add(visitList);
@@ -78,7 +75,13 @@ public class MobileURLVisit {
                 }
             }
         }
-
+        /*
+        List<String> visitPatientId = new ArrayList<>();
+        for(int i=0; i<visitLists.size(); i++){
+            visitPatientId.add(visitLists.get(i).getUser_id());
+        }
+        List<VisitLists> matchVisitList = visitListsRepository.getVisitsOfGivenList(visitUserId);
+        */
         patientRepository.saveAll(patients);
         visitListsRepository.saveAll(visitLists);
         Visits visit = new Visits();
@@ -87,7 +90,6 @@ public class MobileURLVisit {
         appList.add(appUserList);
         visit.setAppUserList(appList);
         visitsRepository.save(visit);
-
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 }

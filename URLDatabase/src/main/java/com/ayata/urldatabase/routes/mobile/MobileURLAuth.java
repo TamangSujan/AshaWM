@@ -2,19 +2,23 @@ package com.ayata.urldatabase.routes.mobile;
 
 import com.ayata.urldatabase.controller.AuthController;
 import com.ayata.urldatabase.model.bridge.ForgotPassword;
-import com.ayata.urldatabase.model.bridge.ResponseDetailsV2;
+import com.ayata.urldatabase.model.bridge.ResponseDetails;
 import com.ayata.urldatabase.model.bridge.ResponseMessage;
+import com.ayata.urldatabase.model.bridge.UpdateProfileForm;
 import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.model.token.UsernamePassword;
 import com.ayata.urldatabase.model.token.UsernameToken;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.security.Jwt;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,22 +35,33 @@ import java.nio.file.StandardCopyOption;
 @AllArgsConstructor
 public class MobileURLAuth {
     private AuthenticationManager authenticationManager;
-    private UserRepository userRepository;
+    private UserRepository   userRepository;
     private AuthController authController;
+    private BCryptPasswordEncoder encoder;
 
-    @PostMapping(value = "/loginUser", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity loginUser(UsernamePassword usernamePassword){
+    private static Logger log = LogManager.getLogger(MobileURLAuth.class);
+    @PostMapping(value = "/loginUser")
+    public ResponseEntity loginUser(@RequestBody UsernamePassword usernamePassword){
+        log.debug("User entered!");
         if(usernamePassword.getPhone().equals("") || usernamePassword.getPassword().equals("")){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Field Should Not Be Empty"));
+            log.error("Empty phone or password!");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "Failure", "Field Should Not Be Empty"));
         }
         Users dbUser = userRepository.findByPhone(usernamePassword.getPhone());
         if(dbUser==null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "User Not Found"));
+            log.error("User not found!");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "Failure", "User Not Found"));
         }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
-        String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser");
-        ResponseDetailsV2 response = new ResponseDetailsV2("200", "success", new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), dbUser.getChw_address(), dbUser.getChw_designation(), dbUser.getImage(), access_token));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        if(encoder.matches(usernamePassword.getPassword(), dbUser.getPassword())){
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
+            String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser", false);
+            ResponseDetails response = new ResponseDetails(200, "success", "", new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), dbUser.getChw_address(), dbUser.getChw_designation(), dbUser.getImage(), access_token));
+            log.info("User found with correct credentials!");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }else{
+            log.error("User sent bad credentials");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(400, "Failure", "Invalid Credentials", null));
+        }
     }
 
     @PostMapping("/addUser")
@@ -67,17 +82,21 @@ public class MobileURLAuth {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "Failure", message));
     }
 
+    /*
+        JSON and XML = @RequestBody
+        Multipart Form = @ModelAttribute
+     */
     @PostMapping(value = "/updateProfile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateUser(HttpServletRequest request, @RequestParam("image") MultipartFile image) throws IOException, ServletException {
-        System.out.println(image.getResource().getFilename());
-        Users user = userRepository.findByChwId(Integer.parseInt(request.getParameter("chw_id")));
-        user.setChw_name(request.getParameter("chw_name"));
-        user.setChw_address(request.getParameter("chw_address"));
-        user.setChw_dob(request.getParameter("chw_dob"));
-        user.setChw_designation(request.getParameter("chw_designation"));
-        user.setChw_gender(request.getParameter("chw_gender"));
-        String filepath = System.getProperty("user.dir")+"/Assets/Image/"+image.getResource().getFilename();
-        createFile(image, filepath);
+    public ResponseEntity<?> updateUser(@ModelAttribute("image") UpdateProfileForm form, HttpServletRequest request) throws IOException, ServletException {
+        String chw_id = form.getChw_id();
+        Users user = userRepository.findByChwId(Integer.parseInt(chw_id));
+        user.setChw_name(form.getChw_name());
+        user.setChw_address(form.getChw_address());
+        user.setChw_dob(form.getChw_dob());
+        user.setChw_designation(form.getChw_designation());
+        user.setChw_gender(form.getChw_gender());
+        String filepath = System.getProperty("user.dir")+"/Assets/Image/"+form.getImage().getResource().getFilename();
+        createFile(form.getImage(), filepath);
         user.setImage("http://192.168.1.83:8082"+filepath);
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Updated!"));

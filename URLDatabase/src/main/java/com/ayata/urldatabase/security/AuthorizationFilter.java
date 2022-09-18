@@ -14,7 +14,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public class AuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/api/loginUser") || request.getServletPath().equals("/api/addUser")){
+        String path = request.getServletPath();
+        if(path.equals("/api/loginUser") || path.equals("/api/addUser")
+                || path.equals("/api/v2/mobile/loginUser") || path.startsWith("/home/sujan/Documents/Java/AshaWM/Assets/Image")){
             filterChain.doFilter(request, response);
         }else{
             String header = request.getHeader(HttpHeaders.AUTHORIZATION);

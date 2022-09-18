@@ -22,7 +22,6 @@ public class UrlDatabaseApplication {
         return new BCryptPasswordEncoder();
     }
 
-
     @Autowired
     void setMapKeyDotReplacement(MappingMongoConverter mappingMongoConverter) {
         mappingMongoConverter.setMapKeyDotReplacement(".");

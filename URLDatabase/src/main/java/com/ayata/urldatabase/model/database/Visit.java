@@ -10,15 +10,19 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(value="visitsVisitSafe")
 public class Visit {
-    private ModelVisitChronic modelVisitChronic;
-    private String patient_id;
-    private String visit_category;
-    private Date visit_followupdate_english;
-    private String visit_followupdate_nepali;
-    private String visit_id;
-    private Date visit_lastdate_english;
-    private String visit_lastdate_nepali;
-    private String ward;
+    public EnteredDateTime entered_date_time;
+    public boolean isSync;
+    public ModelVisitChronic modelVisitChronic;
+    public ModelVisitSafe modelVisitSafe;
+    public String patient_id;
+    public String visit_category;
+    public String visit_followupdate_english;
+    public String visit_followupdate_nepali;
+    public String visit_id;
+    public String visit_lastdate_english;
+    public String visit_lastdate_nepali;
+    public Double visit_latitude;
+    public Double visit_longitude;
+    public Integer ward;
 }

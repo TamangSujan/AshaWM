@@ -7,6 +7,8 @@ import com.ayata.urldatabase.model.bridge.CheckCensusResponse;
 import com.ayata.urldatabase.repository.ResidentsRepository;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,15 +24,25 @@ import java.util.List;
 @RequestMapping("/api/v2/mobile")
 public class MobileURLCensus {
     private ResidentsRepository residentsRepository;
+    private static Logger log = LogManager.getLogger(MobileURLCensus.class);
+
     @PostMapping("/checkCensus")
     public ResponseEntity<?> checkMobileCensus(@RequestBody List<String> residents){
-        String appUserId = Library.splitAndGetFirst(residents.get(0), "_");
-        List<Residents> checkResident = residentsRepository.findAllByUserIdExceptGivenList(appUserId, residents);
-        CheckCensusResponse response = new CheckCensusResponse(appUserId, new ArrayList<>());
-        for(Residents resident: checkResident){
-            response.getCensusList().add(resident.getResidentOnly());
+        log.info("Requested Check Census");
+        try {
+            String appUserId = Library.splitAndGetFirst(residents.get(0), "_");
+            List<Residents> checkResident = residentsRepository.findAllByUserIdExceptGivenList(appUserId, residents);
+            CheckCensusResponse response = new CheckCensusResponse(appUserId, new ArrayList<>());
+            for (Residents resident : checkResident) {
+                response.getCensusList().add(resident.getResidentOnly());
+            }
+            log.info("Census sent!");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }catch (RuntimeException ex){
+            System.out.println(ex.getCause());
+            log.error("Check census error!");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "failure", ex.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/addCensus")

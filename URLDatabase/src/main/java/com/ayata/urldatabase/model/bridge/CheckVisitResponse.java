@@ -1,6 +1,8 @@
 package com.ayata.urldatabase.model.bridge;
 
 import com.ayata.urldatabase.model.database.ModelPatientList;
+import com.ayata.urldatabase.model.database.ModelVisitList;
+import com.ayata.urldatabase.model.database.Visit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CheckVisitResponse {
     private String appUserId;
-    private List<ModelPatientList> modelPatientList;
+    private Object modelPatientList;
 }
 

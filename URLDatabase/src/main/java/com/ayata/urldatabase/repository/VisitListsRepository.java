@@ -18,6 +18,9 @@ public interface VisitListsRepository extends MongoRepository<VisitLists, String
     @Aggregation(pipeline = "{$match: {'user_id': ?0}}")
     public List<VisitLists> getVisitListByUserId(String id);
 
-    @Aggregation(pipeline = {"{$match: {$and: [{'user_id': ?0},{'patient_id' :{$nin : ?1}}]}}"})
+    @Aggregation(pipeline = {"{$match: {$and: [{'user_id': ?0},{'visit.visit_id' :{$nin : ?1}}]}}"})
     List<VisitLists> getVisitsExceptGivenList(String user, List<String> list);
+
+    @Aggregation(pipeline = {"{$match: {$and: [{'user_id': ?0},{'visit.visit_id' :{$in : ?1}}]}}"})
+    List<VisitLists> getVisitsOfGivenList(String user, List<String> list);
 }

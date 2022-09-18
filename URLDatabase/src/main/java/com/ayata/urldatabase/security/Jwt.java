@@ -18,12 +18,19 @@ import java.util.Map;
 public class Jwt {
     private static String secret = "ayata";
 
-    public static String getAccessToken(String phone, int minutes, String path){
-        return JWT.create()
-                .withSubject(phone)
-                .withExpiresAt(new Date(System.currentTimeMillis()+(minutes*60*1000)))
-                .withIssuer(path)
-                .sign(Algorithm.HMAC256(secret));
+    public static String getAccessToken(String phone, int minutes, String path, boolean expire){
+        if(expire) {
+            return JWT.create()
+                    .withSubject(phone)
+                    .withExpiresAt(new Date(System.currentTimeMillis() + (minutes * 60 * 1000)))
+                    .withIssuer(path)
+                    .sign(Algorithm.HMAC256(secret));
+        }else{
+            return JWT.create()
+                    .withSubject(phone)
+                    .withIssuer(path)
+                    .sign(Algorithm.HMAC256(secret));
+        }
     }
 
     public static String getRefreshToken(String phone, int minutes, String path){

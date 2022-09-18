@@ -65,7 +65,4 @@ public class AuthService {
     private Users getUserByChwId(Integer chwId){
         return userRepo.findByChwId(chwId);
     }
-    private int totalUsers(){
-        return userRepo.totalUsers();
-    }
 }

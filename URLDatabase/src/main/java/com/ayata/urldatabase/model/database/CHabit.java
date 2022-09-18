@@ -1,8 +1,8 @@
 package com.ayata.urldatabase.model.database;
 
 public class CHabit{
-    public String _visit_patient_detail_ward_ward_id;
-    public String chronic_habit_id;
+    public int _visit_patient_detail_ward_ward_id;
+    public int chronic_habit_id;
     public String drink;
     public String drink_amount;
     public String exercise;

@@ -8,6 +8,8 @@ import com.ayata.urldatabase.repository.VisitsRepository;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +28,14 @@ public class MobileURLVisit {
     private PatientRepository patientRepository;
     private VisitsRepository visitsRepository;
     private VisitListsRepository visitListsRepository;
-
+    private static Logger log = LogManager.getLogger(MobileURLVisit.class);
     @PostMapping(value = "/addVisit")
     public ResponseEntity<?> addVisit(HttpServletRequest request) throws ServletException, IOException {
+        log.info("REQUEST: Add Visit");
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         AppUserList appUserList = objectMapper.readValue(request.getParameter("json"), AppUserList.class);
+        System.out.println(appUserList.toString());
         List<Patients> patients = new ArrayList<>();
         List<VisitLists> visitLists = new ArrayList<>();
         for(ModelPatientList modelPatientList: appUserList.getModelPatientList()){
@@ -90,6 +94,7 @@ public class MobileURLVisit {
         appList.add(appUserList);
         visit.setAppUserList(appList);
         visitsRepository.save(visit);
+        log.info("SUCCESS: Adding Visit");
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 }

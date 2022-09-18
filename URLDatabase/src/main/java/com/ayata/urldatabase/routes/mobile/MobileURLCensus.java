@@ -28,7 +28,7 @@ public class MobileURLCensus {
 
     @PostMapping("/checkCensus")
     public ResponseEntity<?> checkMobileCensus(@RequestBody List<String> residents){
-        log.info("Requested Check Census");
+        log.info("REQUEST: Check Census");
         try {
             String appUserId = Library.splitAndGetFirst(residents.get(0), "_");
             List<Residents> checkResident = residentsRepository.findAllByUserIdExceptGivenList(appUserId, residents);
@@ -36,21 +36,24 @@ public class MobileURLCensus {
             for (Residents resident : checkResident) {
                 response.getCensusList().add(resident.getResidentOnly());
             }
-            log.info("Census sent!");
+            log.info("SUCCESS: Sending Census");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }catch (RuntimeException ex){
             System.out.println(ex.getCause());
-            log.error("Check census error!");
+            log.error("ERROR: Check census!");
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "failure", ex.getMessage()));
         }
     }
 
     @PostMapping("/addCensus")
     public ResponseEntity<?> addCensus(@RequestBody CensusRoot censusRoot){
+        log.info("REQUEST: Add Census");
         Residents checkResident = residentsRepository.findByResidentId(censusRoot.censusList.get(0).getResident_id());
         if(checkResident!=null){
+            log.error("ERROR: Add Census - Resident Exists");
             return new ResponseEntity(new ResponseMessage("403", "Failure", "Resident Exists"), HttpStatus.OK);
         }else{
+            log.info("SUCCESS: Adding Census");
             residentsRepository.save(censusRoot.censusList.get(0).getNewResident());
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Resident Added"));
         }

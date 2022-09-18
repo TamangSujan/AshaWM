@@ -10,8 +10,8 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CDisease{
-    private String _visit_patient_detail_ward_ward_id;
-    private String chronic_disease_id;
+    private int _visit_patient_detail_ward_ward_id;
+    private int chronic_disease_id;
     private ArrayList<String> diseaseName;
     private String patient_id;
     private String visit_id;

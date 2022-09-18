@@ -8,6 +8,8 @@ import com.ayata.urldatabase.repository.InfantVisitsRepository;
 import com.ayata.urldatabase.repository.InfantsRepository;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,8 +27,10 @@ public class MobileURLInfant {
     private InfantVisitListsRepository infantVisitListsRepository;
     private InfantVisitsRepository infantVisitsRepository;
     private InfantsRepository infantsRepository;
+    private static Logger log = LogManager.getLogger(MobileURLInfant.class);
     @PostMapping("/addInfantVisit")
     public ResponseEntity<?> addVisit(@RequestBody InfantAppUserList appUserList){
+        log.info("REQUEST: Add Infant Visit");
         List<Infants> infants = new ArrayList<>();
         List<InfantVisitLists> visitLists = new ArrayList<>();
         for(ModelInfant modelInfant: appUserList.getModelInfants()){
@@ -89,11 +93,13 @@ public class MobileURLInfant {
         appList.add(appUserList);
         visit.setAppUserList(appList);
         infantVisitsRepository.save(visit);
+        log.info("SUCCESS: Adding Infant Visit");
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 
     @PostMapping("/checkInfantVisit")
     public ResponseEntity<?> checkInfantVisit(@RequestBody List<String> list){
+        log.info("REQUEST: Check Infant Visit");
         String user = Library.splitAndGetFirst(list.get(0), "_");
         CheckInfantResponse response = new CheckInfantResponse(user, new ArrayList<>());
         List<InfantVisits> visits = infantVisitsRepository.getInfantVisitExceptGivenList(user, list);
@@ -102,6 +108,7 @@ public class MobileURLInfant {
                 response.getModelInfantList().add(appUserList.getModelInfants().get(0));
             }
         }
+        log.info("SUCCESS: Sending Infant Visit");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ModelVisitList{
     private EnteredDateTime entered_date_time;
-    private ModelVisitSafe modelVisitSafe;
+    private Object modelVisitSafe;
     private String patient_id;
     private String visit_category;
     private String visit_followupdate_english;
@@ -24,7 +24,7 @@ public class ModelVisitList{
     private String visit_lastdate_nepali;
     private double visit_latitude;
     private double visit_longitude;
-    private String ward;
+    private int ward;
     private boolean isSync;
-    private ModelVisitChronic modelVisitChronic;
+    private Object modelVisitChronic;
 }

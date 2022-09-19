@@ -1,23 +1,27 @@
-package com.ayata.urldatabase.routes;
+package com.ayata.urldatabase.routes.web;
 
 import com.ayata.urldatabase.controller.AuthController;
 import com.ayata.urldatabase.model.bridge.ForgotPassword;
+import com.ayata.urldatabase.model.bridge.Phone;
 import com.ayata.urldatabase.model.bridge.UpdateProfile;
 import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.model.bridge.ResponseMessage;
-import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.model.token.UsernamePassword;
 import com.ayata.urldatabase.model.token.UsernameToken;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.security.Jwt;
 import com.ayata.urldatabase.security.JwtUser;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -28,6 +32,7 @@ public class URLAuth {
     private AuthController authController;
     private BCryptPasswordEncoder encoder;
     private JwtUser userDetails;
+    private static Logger log = LogManager.getLogger(URLAuth.class);
     @PostMapping("/loginUser")
     public ResponseEntity loginUser(@RequestBody UsernamePassword usernamePassword){
         if(usernamePassword.getPhone().equals("") || usernamePassword.getPassword().equals("")){
@@ -38,7 +43,7 @@ public class URLAuth {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "User Not Found"));
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
-        String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser", true);
+        String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser", false);
         return ResponseEntity.status(HttpStatus.OK).body(new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), dbUser.getChw_address(), dbUser.getChw_designation(), dbUser.getImage(), access_token));
     }
 
@@ -62,19 +67,27 @@ public class URLAuth {
 
     @PostMapping("/updateProfile")
     public ResponseEntity<?> updateUser(@RequestBody UpdateProfile updateProfile){
-        Users user = userRepository.findByChwId(updateProfile.getChw_id());
-        user.setChw_name(updateProfile.getChw_name());
-        user.setChw_address(updateProfile.getChw_address());
-        user.setChw_dob(updateProfile.getChw_dob());
-        user.setChw_designation(updateProfile.getChw_designation());
-        user.setChw_gender(updateProfile.getChw_gender());
-        //user.setImage(updateProfile.getChw_image());
-        userRepository.save(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        log.info("REQUEST: Update Profile");
+        Optional<Users> user = userRepository.findByChwIdWeb(updateProfile.getChw_id());
+        if(user.isPresent()){
+            authController.updateProfile(updateProfile, user.get());
+        }else{
+            log.error("ERR: User doesn't exists!");
+            throw new IllegalStateException("User doesn't exist!");
+        }
+        log.info("SUCCESS: Profile Updated!");
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Successfully Updated!"));
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<?> getTest(){
-        return ResponseEntity.status(HttpStatus.OK).body(new Message("Am i authenticated and authorized?"));
+    @PostMapping("/deleteUser")
+    public ResponseEntity<?> deleteUser(@RequestBody Phone phone){
+        Optional<Users> user = userRepository.findByPhoneWeb(phone.getPhone());
+        if(user.isPresent()){
+            authController.removeUser(user.get());
+        }else{
+            throw new IllegalStateException("User doesn't exists!");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Successfully Deleted!"));
     }
+
 }

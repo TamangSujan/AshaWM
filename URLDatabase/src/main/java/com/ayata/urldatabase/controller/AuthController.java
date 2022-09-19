@@ -1,5 +1,7 @@
 package com.ayata.urldatabase.controller;
 
+import com.ayata.urldatabase.model.bridge.UpdateProfile;
+import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.services.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,7 +17,7 @@ public class AuthController {
         if(!isNepalesePhoneNumber(phone)){
             return "Please provide a valid number!";
         }
-        return authService.createUser(phone.substring(4), password);
+        return authService.createUser(phone, password);
     }
 
     public String forgotPassword(String phone, String password, String confirmPassword){
@@ -30,6 +32,21 @@ public class AuthController {
         }
         return "Error";
     }
+
+    public void updateProfile(UpdateProfile profile, Users user){
+        user.setChw_address(profile.getChw_address());
+        user.setChw_name(profile.getChw_name());
+        user.setChw_dob(profile.getChw_dob());
+        user.setChw_gender(profile.getChw_gender());
+        user.setChw_designation(profile.getChw_designation());
+        user.setImage(profile.getImage());
+        authService.updateUser(user);
+    }
+
+    public void removeUser(Users user){
+        authService.deleteUser(user);
+    }
+
     private boolean isEmptyPhone(String phone){
         if(phone.equals("")){
             return true;
@@ -45,10 +62,10 @@ public class AuthController {
     }
 
     private boolean isNepalesePhoneNumber(String phone){
-        if(!phone.startsWith("+977")){
+        if(!phone.startsWith("9")){
             return false;
         }
-        if(phone.length()<14){
+        if(phone.length()!=10){
             return false;
         }
         return true;

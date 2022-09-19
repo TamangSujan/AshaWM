@@ -14,4 +14,5 @@ public class UpdateProfile {
     private String chw_dob;
     private String chw_designation;
     private String chw_gender;
+    private String image;
 }

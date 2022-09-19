@@ -1,5 +1,6 @@
 package com.ayata.urldatabase.services;
 
+import com.ayata.urldatabase.model.bridge.UpdateProfile;
 import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -32,23 +33,13 @@ public class AuthService {
         return "ok";
     }
 
-    public String deleteUser(String phone){
-        userRepo.delete(getUserByPhone(phone));
-        return "ok";
+    public void deleteUser(Users user){
+        // TODO: Delete Image by name
+        userRepo.delete(user);
     }
 
-    public String updateUser(Integer chw_id, String chw_address, String chw_name,
-                             String chw_dob, String chw_gender, String chw_designation,
-                             String path){
-        Users user = getUserByChwId(chw_id);
-        user.setChw_address(chw_address);
-        user.setChw_name(chw_name);
-        user.setChw_dob(chw_dob);
-        user.setChw_gender(chw_gender);
-        user.setChw_designation(chw_designation);
-        user.setImage(path);
+    public void updateUser(Users user){
         userRepo.save(user);
-        return "ok";
     }
 
     public String changePassword(Integer chw_id, String confirmPassword){

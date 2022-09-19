@@ -20,8 +20,13 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }else{
             String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-            if(header!=null & header.startsWith("Basic Bearer ")){
-                DecodedJWT extractedToken = Jwt.extractToken(header.substring(13));
+            if(header!=null){
+                DecodedJWT extractedToken = null;
+                if(header.startsWith("Basic Bearer")){
+                    extractedToken = Jwt.extractToken(header.substring(13));
+                }else if(header.startsWith("Bearer ")){
+                    extractedToken = Jwt.extractToken(header.substring(7));
+                }
                 Jwt.checkPhone(extractedToken.getSubject());
                 filterChain.doFilter(request, response);
             }else{

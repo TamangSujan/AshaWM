@@ -5,10 +5,13 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
@@ -70,5 +73,14 @@ public class Jwt {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getPhone(HttpServletRequest request){
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if(token.startsWith("Bearer")){
+            token = token.substring(7);
+        }
+        DecodedJWT extractedToken = extractToken(token);
+        return extractedToken.getSubject();
     }
 }

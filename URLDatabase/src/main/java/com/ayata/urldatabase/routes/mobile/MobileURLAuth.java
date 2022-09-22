@@ -54,7 +54,7 @@ public class MobileURLAuth {
         }
         if(encoder.matches(usernamePassword.getPassword(), dbUser.getPassword())){
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
-            String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/loginUser", false);
+            String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 60*8, "/api/v2/mobile/loginUser", false);
             ResponseDetails response = new ResponseDetails(200, "success", "", new UsernameToken(dbUser.getChw_id(), dbUser.getChw_name(), dbUser.getChw_gender(), dbUser.getChw_dob(), dbUser.getChw_address(), dbUser.getChw_designation(), dbUser.getImage(), access_token));
             log.info("User found with correct credentials!");
             return ResponseEntity.status(HttpStatus.OK).body(response);

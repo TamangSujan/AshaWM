@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/v2/web")
 public class URLCensus {
     private ResidentsRepository residentsRepository;
     @PostMapping("/addCensus")

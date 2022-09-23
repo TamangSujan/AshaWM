@@ -1,6 +1,7 @@
 package com.ayata.urldatabase;
 
 import com.spring4all.mongodb.EnableMongoPlus;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,8 +9,6 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 @EnableMongoPlus
@@ -19,13 +18,14 @@ public class UrlDatabaseApplication {
         SpringApplication.run(UrlDatabaseApplication.class, args);
     }
 
+    @Autowired
+    public void setMapKeyDotReplacement(MappingMongoConverter mappingMongoConverter) {
+        mappingMongoConverter.setMapKeyDotReplacement(".");
+    }
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
-    @Autowired
-    void setMapKeyDotReplacement(MappingMongoConverter mappingMongoConverter) {
-        mappingMongoConverter.setMapKeyDotReplacement(".");
-    }
 }

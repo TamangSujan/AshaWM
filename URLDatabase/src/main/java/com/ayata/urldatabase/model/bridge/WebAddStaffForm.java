@@ -29,7 +29,7 @@ public class WebAddStaffForm {
     private String chw_firstname_nepali;
     private String chw_middlename_nepali;
     private String chw_lastname_nepali;
-    private Date chw_dob;
+    private String chw_dob;
     private String chw_doc_type;
     private Integer chw_doc_number;
     private String chw_gender;
@@ -51,5 +51,5 @@ public class WebAddStaffForm {
     private String chw_emergency_contact_number;
     private String chw_dob_nepali;
     private MultipartFile image;
-    private File file;
+    private MultipartFile file;
 }

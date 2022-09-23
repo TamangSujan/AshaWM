@@ -1,16 +1,16 @@
 package com.ayata.urldatabase.services;
 
-import com.ayata.urldatabase.model.bridge.UpdateProfile;
 import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class AuthService {
-    private UserRepository userRepo;
+    @Autowired    private UserRepository userRepo;
     private BCryptPasswordEncoder encoder;
     public String createUser(String phone, String password){
         Users user = getUserByPhone(phone);

@@ -20,13 +20,14 @@ public class WebStaff {
     private String chw_identifier;
     private String creator;
     private String chw_notes;
+    private String chw_name;
     private String chw_firstname;
     private String chw_middlename;
     private String chw_lastname;
     private String chw_firstname_nepali;
     private String chw_middlename_nepali;
     private String chw_lastname_nepali;
-    private Date chw_dob;
+    private String chw_dob;
     private String chw_doc_type;
     private Integer chw_doc_number;
     private String chw_gender;
@@ -63,6 +64,7 @@ public class WebStaff {
         webStaff.chw_firstname = webAddStaffForm.getChw_firstname();
         webStaff.chw_middlename = webAddStaffForm.getChw_middlename();
         webStaff.chw_lastname = webAddStaffForm.getChw_lastname();
+        webStaff.chw_name = webStaff.chw_firstname +" "+ webStaff.chw_middlename +" "+ webStaff.chw_lastname;
         webStaff.chw_firstname_nepali = webAddStaffForm.getChw_firstname_nepali();
         webStaff.chw_middlename_nepali = webAddStaffForm.getChw_middlename_nepali();
         webStaff.chw_lastname_nepali = webAddStaffForm.getChw_lastname_nepali();

@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChwListResponse {
-    private int resultPerPage;
+    private int resultsPerPage;
     private int currentPage;
     private int total;
-    private List<Users> chwList;
+    private List<Users> chwsList;
 }

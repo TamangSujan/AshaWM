@@ -5,11 +5,9 @@ import com.ayata.urldatabase.model.bridge.*;
 import com.ayata.urldatabase.model.database.Doctors;
 import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.model.token.UsernamePassword;
-import com.ayata.urldatabase.model.token.UsernameToken;
 import com.ayata.urldatabase.repository.DoctorRepository;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.security.Jwt;
-import com.ayata.urldatabase.security.JwtUser;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,9 +27,9 @@ public class URLAuth {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private DoctorRepository doctorRepository;
-    private AuthController authController;
     private static Logger log = LogManager.getLogger(URLAuth.class);
     private BCryptPasswordEncoder encoder;
+    private AuthController authController;
     @PostMapping("/login")
     public ResponseEntity loginUser(@RequestBody UsernamePassword usernamePassword){
         log.info("REQUEST: Login");

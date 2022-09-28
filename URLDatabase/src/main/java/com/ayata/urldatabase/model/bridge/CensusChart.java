@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DoctorResponse {
-    private Integer doc_id;
-    private String name;
-    private String phone;
-    private String token;
-    private String ip;
+public class CensusChart {
+    private int total;
+    private List<CensusChartList> chart;
+    private List<String> x;
+    private List<String> y;
 }

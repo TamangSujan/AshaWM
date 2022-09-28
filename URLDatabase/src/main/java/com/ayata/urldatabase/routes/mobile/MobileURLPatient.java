@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.routes.mobile;
 
-import com.ayata.urldatabase.model.bridge.CheckVisitResponse;
+import com.ayata.urldatabase.model.bridge.Response.CheckVisitResponse;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.repository.VisitsRepository;
 import com.ayata.urldatabase.static_methods.Library;

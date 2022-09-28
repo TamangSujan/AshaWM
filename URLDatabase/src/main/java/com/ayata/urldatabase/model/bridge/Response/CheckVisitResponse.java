@@ -1,4 +1,4 @@
-package com.ayata.urldatabase.model.bridge;
+package com.ayata.urldatabase.model.bridge.Response;
 
 import com.ayata.urldatabase.model.database.ModelPatientList;
 import com.ayata.urldatabase.model.database.ModelVisitList;

@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddSyncResponse {
-    private String app_user_id;
-    private String date;
-    private String time;
-    private int id;
+public class PatientChart {
+    private Integer total;
+    private List<PatientChartList> chart;
+    private List<String> x;
+    private List<Integer> y;
 }

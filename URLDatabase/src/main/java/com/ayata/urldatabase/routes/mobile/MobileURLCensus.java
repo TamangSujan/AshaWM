@@ -3,7 +3,7 @@ package com.ayata.urldatabase.routes.mobile;
 import com.ayata.urldatabase.model.bridge.CensusRoot;
 import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.database.Residents;
-import com.ayata.urldatabase.model.bridge.CheckCensusResponse;
+import com.ayata.urldatabase.model.bridge.Response.CheckCensusResponse;
 import com.ayata.urldatabase.repository.ResidentsRepository;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;

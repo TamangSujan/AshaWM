@@ -1,6 +1,7 @@
 package com.ayata.urldatabase.model.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,47 +15,30 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(value = "patients")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Patients{
     @Id @JsonIgnore
     private String _id;
-    @JsonIgnore
     private String user;
-
     private String patientAddedDate;
-    @JsonIgnore
     private String patientAge;
-    @JsonIgnore
     private String patientDob;
-    @JsonIgnore
     private String patientFirstName;
-
     private String patientFullName;
-    @JsonIgnore
     private String patientGender;
-    @JsonIgnore
     private String patientHouseno;
-
     private String patientId;
-    @JsonIgnore
     private String patientLastName;
-
     private String patientMunicipality;
-
     private String patientPhone;
-    @JsonIgnore
     private String patientSpouseFullName;
-    @JsonIgnore
     private String patientVillagename;
-    @JsonIgnore
     private String patientspousefirstname;
-    @JsonIgnore
     private String patientspouselastname;
-    @JsonIgnore
     private Integer patientwardno;
-
+    private boolean longitude;
+    private boolean latitude;
     private String image;
-    @JsonIgnore
     private String __v;
-    @JsonIgnore
     private boolean deleted;
 }

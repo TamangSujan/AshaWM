@@ -35,9 +35,9 @@ import java.nio.file.StandardCopyOption;
 @AllArgsConstructor
 public class MobileURLAuth {
     private AuthenticationManager authenticationManager;
-    private UserRepository   userRepository;
-    private AuthController authController;
+    private UserRepository userRepository;
     private BCryptPasswordEncoder encoder;
+    private AuthController authController;
 
     private static Logger log = LogManager.getLogger(MobileURLAuth.class);
     @PostMapping(value = "/loginUser")

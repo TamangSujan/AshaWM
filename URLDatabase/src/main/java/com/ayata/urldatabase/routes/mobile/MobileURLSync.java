@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.routes.mobile;
 
-import com.ayata.urldatabase.model.bridge.AddSyncResponse;
+import com.ayata.urldatabase.model.bridge.Response.AddSyncResponse;
 import com.ayata.urldatabase.model.bridge.ResponseDetails;
 import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.database.SyncHistories;

@@ -11,18 +11,18 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Visit {
-    public EnteredDateTime entered_date_time;
-    public boolean isSync;
-    public ModelVisitChronic modelVisitChronic;
-    public ModelVisitSafe modelVisitSafe;
-    public String patient_id;
-    public String visit_category;
-    public String visit_followupdate_english;
-    public String visit_followupdate_nepali;
-    public String visit_id;
-    public String visit_lastdate_english;
-    public String visit_lastdate_nepali;
-    public Double visit_latitude;
-    public Double visit_longitude;
-    public Integer ward;
+    private EnteredDateTime entered_date_time;
+    private boolean isSync;
+    private ModelVisitChronic modelVisitChronic;
+    private ModelVisitSafe modelVisitSafe;
+    private String patient_id;
+    private String visit_category;
+    private String visit_followupdate_english;
+    private String visit_followupdate_nepali;
+    private String visit_id;
+    private String visit_lastdate_english;
+    private String visit_lastdate_nepali;
+    private Double visit_latitude;
+    private Double visit_longitude;
+    private Integer ward;
 }

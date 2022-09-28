@@ -1,6 +1,6 @@
 package com.ayata.urldatabase.routes.mobile;
 
-import com.ayata.urldatabase.model.bridge.CheckInfantResponse;
+import com.ayata.urldatabase.model.bridge.Response.CheckInfantResponse;
 import com.ayata.urldatabase.model.bridge.ResponseMessage;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.repository.InfantVisitListsRepository;

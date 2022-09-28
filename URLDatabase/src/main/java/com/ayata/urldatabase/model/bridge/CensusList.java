@@ -27,8 +27,8 @@ public class CensusList {
         Residents resident = new Residents();
         resident.setAppuser_id(this.getAppuser_id());
         resident.setSync(this.isSync());
-        resident.setResident_id(this.getResident_id());
-        resident.setResident_assign_id(this.getResident_assign_id());
+        resident.setResidentId(this.getResident_id());
+        resident.setResidentAssignId(this.getResident_assign_id());
         resident.setResident(this.getResident());
         resident.setResidentAddress(this.getResidentAddress());
         resident.setResidentDetail(this.getResidentDetail());

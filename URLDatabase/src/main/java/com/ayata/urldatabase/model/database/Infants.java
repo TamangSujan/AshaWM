@@ -1,5 +1,6 @@
 package com.ayata.urldatabase.model.database;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(value = "infants")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Infants {
     @Id
     private String _id;
@@ -32,6 +34,7 @@ public class Infants {
     private boolean deleted;
     private int infantAgeInDays;
     private int infantAgeInMonth;
+    private int infantAgeInYear;
     private String infantDobNepali;
     private String infantModifyDate;
 }

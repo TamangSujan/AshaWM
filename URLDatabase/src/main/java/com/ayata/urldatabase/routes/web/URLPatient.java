@@ -90,8 +90,8 @@ public class URLPatient {
     @GetMapping("/total")
     public ResponseEntity<?> getTotal() throws Exception {
         try {
-            int chronicCount = patientRepository.getCounts("CHRONIC_DISEASE");
-            int safeCount = patientRepository.getCounts("SAFE_MOTHERHOOD");
+            int chronicCount = visitListsRepository.getCounts("CHRONIC_DISEASE");
+            int safeCount = visitListsRepository.getCounts("SAFE_MOTHERHOOD");
             int total = patientRepository.getTotalPatient();
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "", new PatientCountResponse(chronicCount, safeCount, total)));
         }catch (Exception e){

@@ -1,6 +1,7 @@
 package com.ayata.urldatabase.repository;
 
 import com.ayata.urldatabase.model.database.InfantVisitLists;
+import com.ayata.urldatabase.model.database.VisitLists;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -10,4 +11,6 @@ public interface InfantVisitListsRepository extends MongoRepository<InfantVisitL
     @Aggregation(pipeline = {"{$match: {'infantVisit.iRisk.does_have_risk': ?0}}"})
     List<InfantVisitLists> getInfantWithRisk(String risk);
 
+    @Aggregation(pipeline = {"{$match: {$and: [{'user_id': ?0},{'infantId' : ?1}]}}"})
+    List<InfantVisitLists> getInfantVisitsList(String user, String infantId);
 }

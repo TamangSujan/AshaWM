@@ -69,8 +69,4 @@ public interface PatientRepository extends MongoRepository<Patients, String> {
                     "'lastname': 1}}"
     })
     public List<LocationPatient> patientLocationDetails();
-
-   @Aggregation(pipeline = {"{$match: {'visit_category': ?0}}",
-                            "{$group: {_id: 1, count: {$sum: 1}}}"})
-   public Integer getCounts(String category);
 }

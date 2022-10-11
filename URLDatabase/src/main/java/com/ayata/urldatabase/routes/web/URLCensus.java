@@ -102,4 +102,25 @@ public class URLCensus {
             throw new Exception(e.getCause());
         }
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateCensus(@PathVariable(value = "id") String id, @RequestBody Residents resident){
+        Residents res = residentsRepository.findByResidentId(id);
+        if(res!=null){
+            resident.set_id(res.get_id());
+            residentsRepository.save(resident);
+            return ResponseEntity.status(200).body(new ResponseMessage("200", "Success", "Census information updated successfully!"));
+        }
+        return ResponseEntity.status(400).body(new ResponseMessage("400", "Failure", "Census not found!"));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteCensus(@PathVariable(value = "id")String id){
+        Residents resident = residentsRepository.findByResidentId(id);
+        if(resident!=null){
+            residentsRepository.delete(resident);
+            return ResponseEntity.status(200).body(new ResponseMessage("200", "Success", "Census deleted successfully!"));
+        }
+        return ResponseEntity.status(400).body(new ResponseMessage("400", "Failure", "Census not found!"));
+    }
 }

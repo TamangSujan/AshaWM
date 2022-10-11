@@ -29,4 +29,8 @@ public interface VisitListsRepository extends MongoRepository<VisitLists, String
 
     @Aggregation(pipeline = "{$match: {'user_id': ?0}}")
     public VisitLists findByUserId(String user);
+
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': ?0}}",
+            "{$count: ?0}"})
+    public Integer getCounts(String category);
 }

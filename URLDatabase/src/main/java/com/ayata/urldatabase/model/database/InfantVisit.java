@@ -26,5 +26,7 @@ public class InfantVisit{
     private String visit_id;
     private String visit_lastdate_english;
     private String visit_lastdate_nepali;
+    private double visit_latitude;
+    private double visit_longitude;
     private String ward;
 }

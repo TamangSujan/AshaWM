@@ -22,9 +22,13 @@ public interface InfantsRepository extends MongoRepository<Infants, String> {
             "{$limit: ?0}"})
     public List<Infants> getLimitInfant(int perPage, int currentPage);
 
-    @Aggregation(pipeline = {"{$match: {'infantId': {$regex: //}}}",
-            "{$group: {_id: 1, count: {$sum: 1}}}"})
+    @Aggregation(pipeline = {"{$count: 'count'}"})
     public Integer getTotalInfant();
+
+    @Aggregation(pipeline = {"{$project: {infantSub :{$substr: ['$infantId', 0, 2]}}}",
+            "{$match: {infantSub: ?0}}",
+            "{$count: 'count'}"})
+    public Integer getTotalInfantById(String chwId);
 
     @Aggregation(pipeline = "{$match: {'infantId': ?0}}")
     public Infants findInfantById(String id);

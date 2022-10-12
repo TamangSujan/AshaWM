@@ -4,6 +4,7 @@ import com.ayata.urldatabase.model.database.Users;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<Users, String> {
@@ -26,4 +27,7 @@ public interface UserRepository extends MongoRepository<Users, String> {
                              "{$sort: {'chw_id': -1}}",
                              "{$limit: 1}"})
     public Users lastUser();
+
+    @Aggregation(pipeline = {"{$project: {name: '$chw_name'}}"})
+    public List<String> getCHWNameList();
 }

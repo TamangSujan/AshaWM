@@ -1,10 +1,7 @@
 package com.ayata.urldatabase.routes.web;
 
 import com.ayata.urldatabase.model.bridge.*;
-import com.ayata.urldatabase.model.bridge.Response.LocationCensusResponse;
-import com.ayata.urldatabase.model.bridge.Response.PatientCountResponse;
-import com.ayata.urldatabase.model.bridge.Response.PatientListResponse;
-import com.ayata.urldatabase.model.bridge.Response.PatientListResponseV2;
+import com.ayata.urldatabase.model.bridge.Response.*;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.repository.PatientRepository;
@@ -22,13 +19,13 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v2/web/Patient")
+@RequestMapping("/api/v2/web")
 public class URLPatient {
     private PatientRepository patientRepository;
     private PatientService patientService;
     private VisitListsRepository visitListsRepository;
     private UserRepository userRepository;
-    @GetMapping("/getPatientList")
+    @GetMapping("/Patient/getPatientList")
     public ResponseEntity<?> getPatientList(@RequestParam int perPage, @RequestParam int currentPage){
         if(currentPage<=0){
             currentPage = 1;
@@ -40,7 +37,7 @@ public class URLPatient {
         return ResponseEntity.status(HttpStatus.OK).body(new Message("Patient List not found in database."));
     }
 
-    @GetMapping("/getPatientDetails/{id}")
+    @GetMapping("/Patient/getPatientDetails/{id}")
     public ResponseEntity<?> getPatientList(@PathVariable String id){
         Patients patient = patientRepository.getPatientById(id);
         if(patient != null){
@@ -50,7 +47,7 @@ public class URLPatient {
         }
     }
 
-    @GetMapping("/get")
+    @GetMapping("/Patient/get")
     public ResponseEntity<?> findPatient(@RequestParam int perPage, @RequestParam int currentPage) throws Exception {
         PatientListResponseV2 response = patientService.getPatientShortDetails(perPage, (currentPage-1)*perPage);
         if(response!=null){
@@ -59,7 +56,7 @@ public class URLPatient {
         throw new IllegalStateException("No patients found!");
     }
 
-    @GetMapping("/chart")
+    @GetMapping("/Patient/chart")
     public ResponseEntity<?> getPatientChart() throws Exception {
         try {
             List<PatientChartList> list = patientRepository.getAllChart();
@@ -76,7 +73,7 @@ public class URLPatient {
         }
     }
 
-    @GetMapping("/location")
+    @GetMapping("/Patient/location")
     public ResponseEntity<?> getPatientLocation() throws Exception {
         try {
             List<LocationPatient> locationPatients = patientRepository.patientLocationDetails();
@@ -87,7 +84,7 @@ public class URLPatient {
         }
     }
 
-    @GetMapping("/total")
+    @GetMapping("/Patient/total")
     public ResponseEntity<?> getTotal() throws Exception {
         try {
             int chronicCount = visitListsRepository.getCounts("CHRONIC_DISEASE");
@@ -99,7 +96,7 @@ public class URLPatient {
         }
     }
 
-    @GetMapping("details/{id}")
+    @GetMapping("/Patient/details/{id}")
     public ResponseEntity<?> getPatientDetails(@PathVariable(value = "id")String id){
         String chwId = Library.splitAndGetFirst(id, "_");
         Patients patient =  patientRepository.getPatientById(id);
@@ -158,7 +155,7 @@ public class URLPatient {
     }
 
     //TODO: not checked due to pupupdate/id
-    @PutMapping("update/{id}")
+    @PutMapping("/Patient/update/{id}")
     public ResponseEntity<?> updatePatientDetails(@PathVariable(value = "id")String id, @RequestBody UpdatePatientModel patientModel){
         String userId = Library.splitAndGetFirst(id, "_");
         Patients patient = patientRepository.getPatientById(id);
@@ -169,7 +166,7 @@ public class URLPatient {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Patient not found!"));
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/Patient/delete/{id}")
     public ResponseEntity<?> deletePatient(@PathVariable(value = "id")String id){
         Patients patient = patientRepository.getPatientById(id);
         if(patient!=null){
@@ -177,5 +174,31 @@ public class URLPatient {
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Patient deleted successfully!"));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Patient not found!"));
+    }
+
+    @GetMapping("/patient/pregnantwoman")
+    public ResponseEntity<?> getPregnantWomen(){
+        List<VisitLists> list = visitListsRepository.getPregnantList();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(list!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(list);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("List not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/pregnantwoman/{id}")
+    public ResponseEntity<?> getPregnantWomen(@PathVariable(value = "id")String id){
+        List<VisitLists> list = visitListsRepository.getPregnantListByChwId(id);
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(list!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(list);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("List not found!");
+        return ResponseEntity.status(400).body(response);
     }
 }

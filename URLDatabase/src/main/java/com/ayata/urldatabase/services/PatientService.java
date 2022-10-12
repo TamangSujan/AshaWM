@@ -5,6 +5,8 @@ import com.ayata.urldatabase.model.bridge.Response.CIPResponse;
 import com.ayata.urldatabase.model.bridge.Response.PatientListResponseV2;
 import com.ayata.urldatabase.model.database.Patients;
 import com.ayata.urldatabase.repository.PatientRepository;
+import com.ayata.urldatabase.repository.VisitListsRepository;
+import com.ayata.urldatabase.routes.web.misc.Category;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PatientService {
     private PatientRepository patientRepository;
+    private VisitListsRepository visitListsRepository;
     public CIPResponse getPatients(int perPage, int currentPage, String id){
         List<Patients> patient = patientRepository.getLimitPatientByUser(perPage, (currentPage - 1) * perPage, id);
         CIPResponse response = new CIPResponse(perPage, currentPage, patientRepository.getTotalPatient());
@@ -26,19 +29,4 @@ public class PatientService {
         PatientListResponseV2 response = new PatientListResponseV2(perPage, currentPage, patientRepository.getTotalPatient(), patientShortDetails);
         return response;
     }
-
-//    public List<List<?>> getPatientsChart(String chw_id){
-//        List<PatientChartList> list = patientRepository.getChart(chw_id);
-//        List<String> x = new ArrayList<>();
-//        List<Integer> y = new ArrayList<>();
-//        for (PatientChartList patientChart : list) {
-//            x.add(patientChart.get_id());
-//            y.add(patientChart.getCount());
-//        }
-//        List<List<?>> listOfList = new ArrayList<>();
-//        listOfList.add(list);
-//        listOfList.add(x);
-//        listOfList.add(y);
-//        return listOfList;
-//    }
 }

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.Date;
 
 @Data
@@ -16,8 +18,9 @@ import java.util.Date;
 public class WebStaff {
     @JsonIgnore
     private String _id;
+    private Integer chw_id;
     private Integer chw_age;
-    private String chw_identifier;
+    private Integer chw_identifier;
     private String creator;
     private String chw_notes;
     private String chw_name;

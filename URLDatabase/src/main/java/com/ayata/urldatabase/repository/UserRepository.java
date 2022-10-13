@@ -14,7 +14,7 @@ public interface UserRepository extends MongoRepository<Users, String> {
     @Aggregation(pipeline = "{$match : {'phone': ?0}}")
     public Optional<Users> findByPhoneWeb(String phone);
 
-    @Aggregation(pipeline = "{$match : {'chw_id': ?0}}")
+    @Aggregation(pipeline = "{$match : {'chw_identifier': ?0}}")
     public Users findByChwId(Integer chw_id);
 
     @Aggregation(pipeline = "{$match : {'chw_id': ?0}}")

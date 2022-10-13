@@ -110,7 +110,7 @@ public class URLChw {
     }
 
     @GetMapping("/CHW/details/{chw_id}")
-    public ResponseEntity<?> getChw(@PathVariable(value = "chw_id") String chw_id){
+    public ResponseEntity<?> getChw(@PathVariable(value = "chw_id") Integer chw_id){
         Optional<WebStaff> webStaff = webChwRepository.getByChwId(chw_id);
         if(webStaff.isPresent()){
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "", webStaff.get()));
@@ -120,7 +120,7 @@ public class URLChw {
 
 
     @PutMapping(value = "/CHW/update/{chw_id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateChw(@PathVariable(value = "chw_id") String chw_id, HttpServletRequest request, @ModelAttribute WebAddStaffForm form) throws IOException {
+    public ResponseEntity<?> updateChw(@PathVariable(value = "chw_id") Integer chw_id, HttpServletRequest request, @ModelAttribute WebAddStaffForm form) throws IOException {
         String phone = Jwt.getPhone(request);
         Optional<Doctors> doc = doctorRepository.findDoctorByPhone(phone);
         if(doc.isPresent()){
@@ -133,13 +133,13 @@ public class URLChw {
             Date date = new Date();
             WebStaff webStaff = WebStaff.getWebStaff(form);
             if(form.getImage()!=null){
-                String imagePath = System.getProperty("user.dir")+"/Assets/Image/"+ date +form.getImage().getResource().getFilename();
+                String imagePath = System.getProperty("user.dir")+"/Assets/Image/"+ date  +form.getImage().getResource().getFilename();
                 createFile(form.getImage(), imagePath);
                 webStaff.setImage(imagePath);
             }
 
             if(form.getFile()!=null){
-                String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date;
+                String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date +form.getFile().getResource().getFilename();
                 createFile(form.getFile(), filePath);
                 webStaff.setFile(filePath);
             }
@@ -233,9 +233,11 @@ public class URLChw {
         response.setMessage("Data not found!");
         return ResponseEntity.status(400).body(response);
     }
-
-    private void createFile(MultipartFile file, String path) throws IOException {
-        Path uploadPath = Paths.get(path);
-        Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+    public void createFile(MultipartFile file, String path) throws IOException {
+        File convertFile = new File(path);
+        convertFile.createNewFile();
+        FileOutputStream fout = new FileOutputStream(convertFile);
+        fout.write(file.getBytes());
+        fout.close();
     }
 }

@@ -18,7 +18,7 @@ public interface ChwRepository extends MongoRepository<Users, String> {
     public Optional<Users> getByPhone(String phone);
 
     @Aggregation(pipeline = "{$match: {'chw_id': ?0}}")
-    public Optional<Users> getByChwId(String chwId);
+    public Optional<Users> getByChwId(Integer chwId);
     @Aggregation(pipeline = "{$count: 'phone'}")
     public Integer totalUser();
 }

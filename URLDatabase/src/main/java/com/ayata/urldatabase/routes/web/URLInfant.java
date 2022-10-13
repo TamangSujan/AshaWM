@@ -1,13 +1,14 @@
 package com.ayata.urldatabase.routes.web;
 
 import com.ayata.urldatabase.model.bridge.*;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.bridge.Response.InfantListResponse;
-import com.ayata.urldatabase.model.bridge.Response.PatientListResponse;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.repository.InfantVisitListsRepository;
 import com.ayata.urldatabase.repository.InfantsRepository;
 import com.ayata.urldatabase.repository.UserRepository;
+import com.ayata.urldatabase.services.InfantService;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,18 +17,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v2/web/Infant")
+@RequestMapping("/api/v2/web")
 public class URLInfant {
 
     private InfantsRepository infantsRepository;
     private InfantVisitListsRepository infantVisitListsRepository;
     private UserRepository userRepository;
+    private InfantService infantService;
 
-    @GetMapping("/get")
+    @GetMapping("/Infant/get")
     public ResponseEntity<?> getInfantList(@RequestParam int perPage, @RequestParam int currentPage){
         if(currentPage<=0){
             currentPage = 1;
@@ -39,12 +40,12 @@ public class URLInfant {
         return ResponseEntity.status(HttpStatus.OK).body(new Message("Patient List not found in database."));
     }
 
-    @GetMapping("/total")
+    @GetMapping("/Infant/total")
     public ResponseEntity<?> totalInfant(){
         return ResponseEntity.status(200).body(new ResponseDetails(200, "Success", "", infantsRepository.getTotalInfant()));
     }
 
-    @GetMapping("/details/{id}")
+    @GetMapping("/Infant/details/{id}")
     public ResponseEntity<?> getInfant(@PathVariable(value = "id")String id){
         String chwId = Library.splitAndGetFirst(id, "_");
         Infants infant =  infantsRepository.findInfantById(id);
@@ -95,7 +96,7 @@ public class URLInfant {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/Infant/update/{id}")
     public ResponseEntity<?> updateInfant(@PathVariable(value = "id")String id, @RequestBody Infants infant){
         Infants inf = infantsRepository.findInfantById(id);
         if(inf!=null) {
@@ -106,7 +107,7 @@ public class URLInfant {
         return ResponseEntity.status(HttpStatus.OK).body(new Message("Infant not found in database."));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/Infant/delete/{id}")
     public ResponseEntity<?> updateInfant(@PathVariable(value = "id")String id){
         Infants infant = infantsRepository.findInfantById(id);
         if(infant!=null) {
@@ -114,5 +115,19 @@ public class URLInfant {
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Infant deleted successfully!"));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Message("Infant not found in database."));
+    }
+
+    @GetMapping("/infant/riskinfant")
+    public ResponseEntity<?> getRiskInfant(){
+        Object object = infantService.getRiskInfants();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null) {
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.setMessage("Data not found!");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 }

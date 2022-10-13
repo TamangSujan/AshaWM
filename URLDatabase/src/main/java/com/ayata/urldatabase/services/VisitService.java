@@ -1,6 +1,7 @@
 package com.ayata.urldatabase.services;
 
 import com.ayata.urldatabase.model.bridge.TrimesterCount;
+import com.ayata.urldatabase.repository.InfantVisitListsRepository;
 import com.ayata.urldatabase.repository.VisitListsRepository;
 import com.ayata.urldatabase.routes.web.misc.Category;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ public class VisitService {
     private final int WEEK = 7*24*60*60*1000;
     private final int MONTH = 30*24*60*60*1000;
     private VisitListsRepository visitListsRepository;
+    private InfantVisitListsRepository infantVisitListsRepository;
     public Integer getPregnantCountByChwId(String chwId){
         Integer count = visitListsRepository.getPregnancyCount(chwId);
         if(count!=null){
@@ -48,12 +50,24 @@ public class VisitService {
         return trimesterCount;
     }
 
+    public Object getPatientTrimester(){
+        return visitListsRepository.getPatientTrimester(WEEK);
+    }
+
     public Integer getNewChronicOrPregnancyCountByChwId(Category category, String chwId){
         Integer total = visitListsRepository.getNewChronicOrPregnancyCount(category, chwId, MONTH);
         if(total!=null){
             return total;
         }
         return 0;
+    }
+
+    public Object getNewChronicOrPregnancy(Category category){
+        return visitListsRepository.getNewChronicOrPregnancy(category, MONTH);
+    }
+
+    public Object getNewChronicOrPregnancyById(Category category, String id){
+        return visitListsRepository.getNewChronicOrPregnancyById(category, id, MONTH);
     }
 
     public Integer getNewDeliveryCountByChwId(String chwId){
@@ -103,4 +117,21 @@ public class VisitService {
         }
         return 0;
     }
+
+    public Object getRiskInfant(){
+        return infantVisitListsRepository.getRiskInfants();
+    }
+
+    public Object getNewDelivery(){
+        return visitListsRepository.getNewDelivery(30*24*60*60*1000);
+    }
+
+    public Object getRiskPregnancy(){
+        return visitListsRepository.getRiskPregnancy();
+    }
+
+    public Object getComplicationDelivery(){
+        return visitListsRepository.getComplicationDelivery();
+    }
+
 }

@@ -10,6 +10,8 @@ import com.ayata.urldatabase.repository.*;
 import com.ayata.urldatabase.security.Jwt;
 import com.ayata.urldatabase.services.PatientService;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,7 @@ public class URLChw {
     private PatientService patientService;
 
     private BCryptPasswordEncoder encoder;
+    private static Logger log = LogManager.getLogger(URLChw.class);
     @GetMapping("/CHW/get")
     public ResponseEntity<?> getChwList(@RequestParam int perPage, @RequestParam int currentPage){
         if(currentPage<=0){
@@ -65,9 +68,11 @@ public class URLChw {
 
     @PostMapping(value = "/CHW/create", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createCHWStaff(HttpServletRequest request, @ModelAttribute WebAddStaffForm form) throws IOException {
+        log.info("REQUEST: CHW Create");
         String phone = Jwt.getPhone(request);
         Optional<Doctors> doc = doctorRepository.findDoctorByPhone(phone);
         if(doc.isPresent()){
+            log.info("CHECK: Doctor Presented");
             Optional<Users> user = chwRepository.getByPhone(form.getPhone());
             if(user.isPresent()){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure", "Phone already exists!",""));
@@ -82,13 +87,15 @@ public class URLChw {
             WebStaff webStaff = WebStaff.getWebStaff(form);
 
             if(form.getImage()!=null){
+                log.info("CHECK: Image Creation");
                 String imagePath = System.getProperty("user.dir")+"/Assets/Image/"+ date +form.getImage().getResource().getFilename();
                 createFile(form.getImage(), imagePath);
                 webStaff.setImage(imagePath);
             }
 
             if(form.getFile()!=null){
-                String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date +form.getFile().getName();
+                log.info("CHECK: File Creation");
+                String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date +form.getFile().getResource().getFilename();
                 createFile(form.getFile(), filePath);
                 webStaff.setFile(filePath);
             }
@@ -96,6 +103,7 @@ public class URLChw {
             webStaff.setPassword(encoder.encode(form.getPassword()));
 
             webChwRepository.save(webStaff);
+            log.info("CHECK: File Saved");
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Staff successfully created!", ""));
         }
         throw new IllegalStateException("Invalid Credentials");
@@ -124,7 +132,6 @@ public class URLChw {
             }
             Date date = new Date();
             WebStaff webStaff = WebStaff.getWebStaff(form);
-
             if(form.getImage()!=null){
                 String imagePath = System.getProperty("user.dir")+"/Assets/Image/"+ date +form.getImage().getResource().getFilename();
                 createFile(form.getImage(), imagePath);
@@ -132,7 +139,7 @@ public class URLChw {
             }
 
             if(form.getFile()!=null){
-                String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date +form.getFile().getName();
+                String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date;
                 createFile(form.getFile(), filePath);
                 webStaff.setFile(filePath);
             }

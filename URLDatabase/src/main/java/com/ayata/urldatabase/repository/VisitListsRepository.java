@@ -59,6 +59,27 @@ public interface VisitListsRepository extends MongoRepository<VisitLists, String
                                         "}},"})
     public List<String> getTrimesterCount(String chwId, Integer time);
 
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'SAFE_MOTHERHOOD'}}",
+            "{$unwind: '$visit'}",
+            "{$project: {'stringDate': {$toString: '$visit.modelVisitSafe.menstrualDate._menstrual_date_period_english'}, " +
+                    "patient_id: '$patientId', ward: '$visit.ward', visit_id: '$visit.visit_id'}}",
+            "{$project: {'date': {$dateFromString: {'dateString': $stringDate, 'format': '%d/%m/%Y'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {'trimester': {$divide: [{$subtract: [new Date(), $date]}, ?0]}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {'roundoff': {$round: [$trimester, 0]}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {'trimester_phase': {"+
+                    "$switch: {"+
+                    "branches: ["+
+                    "{ case: { $lte: [ $roundoff, 13 ] }, then: 'trimester1' },"+
+                    "{ case: { $lte: [ $roundoff, 26 ] }, then: 'trimester2' }"+
+                    "{ case: { $lte: [ $roundoff, 40 ] }, then: 'trimester3' }"+
+                    "{ case: { $lte: [ $roundoff, 52] }, then: 'trimester4' }"+
+                    "],"+
+                    "default: 'finished'"+
+                    "}}"+
+                    ", patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$group: {_id: {patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id', trimester: '$trimester_phase'}}}"})
+    public List<Object> getPatientTrimester(Integer time);
+
     @Aggregation(pipeline = {"{$match: {$and: [{'visit.visit_category': ?0},{user_id: ?1}]}}",
                             "{$unwind: '$visit'}",
                             "{$project: {stringDate: {$toString: '$visit.visit_lastdate_english'}}}",
@@ -68,6 +89,26 @@ public interface VisitListsRepository extends MongoRepository<VisitLists, String
                             "{$match: {newpreg: 'true'}}",
                             "{$count: 'count'}"})
     public Integer getNewChronicOrPregnancyCount(Category category, String chwId, Integer time);
+
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': ?0}}",
+            "{$unwind: '$visit'}",
+            "{$project: {stringDate: {$toString: '$visit.visit_lastdate_english'}, patient_id: '$patientId', ward: '$visit.ward', visit_id: '$visit.visit_id'}}",
+            "{$project: {date: {$dateFromString:{dateString: '$stringDate', format: '%d/%m/%Y'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {remmonth: {$divide: [{$subtract: [new Date(), '$date']} , ?1]}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {newpreg: {$cond: {if: {$and: [{$gte: ['$remmonth', -2]}, {$lte: ['$remmonth', 0]}]}, then: 'true', else: 'false'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$match: {newpreg: 'true'}}",
+            "{$group: {_id: {patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}}"})
+    public List<Object> getNewChronicOrPregnancy(Category category, Integer time);
+
+    @Aggregation(pipeline = {"{$match: {$and: [{'visit.visit_category': ?0},{user_id: ?1}]}}",
+            "{$unwind: '$visit'}",
+            "{$project: {stringDate: {$toString: '$visit.visit_lastdate_english'}, patient_id: '$patientId', ward: '$visit.ward', visit_id: '$visit.visit_id'}}",
+            "{$project: {date: {$dateFromString:{dateString: '$stringDate', format: '%d/%m/%Y'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {remmonth: {$divide: [{$subtract: [new Date(), '$date']} , ?2]}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {newpreg: {$cond: {if: {$and: [{$gte: ['$remmonth', -2]}, {$lte: ['$remmonth', 0]}]}, then: 'true', else: 'false'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$match: {newpreg: 'true'}}",
+            "{$group: {_id: {patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}}"})
+    public List<Object> getNewChronicOrPregnancyById(Category category, String id, Integer time);
 
     @Aggregation(pipeline = {"{$match: {$and: [{'visit.visit_category': 'SAFE_MOTHERHOOD'},{user_id: ?0}]}}",
             "{$unwind: '$visit'}",
@@ -79,17 +120,37 @@ public interface VisitListsRepository extends MongoRepository<VisitLists, String
             "{$count: 'count'}"})
     public Integer getNewDeliveryCount(String chwId, Integer time);
 
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'SAFE_MOTHERHOOD'}}",
+            "{$unwind: '$visit'}",
+            "{$project: {stringDate: {$toString: '$visit.modelVisitSafe.menstrualDate._menstrual_date_edd_english'}, patient_id: '$patientId', ward: '$visit.ward', visit_id: '$visit.visit_id'}}",
+            "{$project: {date: {$dateFromString:{dateString: '$stringDate', format: '%d/%m/%Y'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {remmonth: {$divide: [{$subtract: [new Date(), '$date']} , ?0]}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$project: {newdelivery: {$cond: {if: {$and: [{$gte: ['$remmonth', -2]}, {$lte: ['$remmonth', 0]}]}, then: 'true', else: 'false'}}, patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}",
+            "{$match: {newdelivery: 'true'}}",
+            "{$group: {_id: {new_delivery: '$newdelivery', patient_id: '$patient_id', ward: '$ward', visit_id: '$visit_id'}}}"})
+    public List<Object> getNewDelivery(Integer time);
+
     @Aggregation(pipeline = {"{$match: {$and: [{user_id: ?0}, {'visit.visit_category': 'SAFE_MOTHERHOOD'}, {'visit.modelVisitSafe.checkup._checkup_risk_sign': {$exists: true,$nin: ['NONE']}}]}}",
                             "{$unwind: $visit}",
                             "{$group: {_id: {patientId: '$patientId', visitId: '$visit.visit_id', ward: '$visit.ward', risk: '$visit.modelVisitSafe.checkup._checkup_risk_sign'}}}",
                             "{$count: 'total'}"})
     public Integer getRiskPregnancyCountByChwId(String chwId);
 
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'SAFE_MOTHERHOOD', 'visit.modelVisitSafe.checkup._checkup_risk_sign': {$exists: true,$nin: ['NONE']}}}",
+            "{$unwind: $visit}",
+            "{$group: {_id: {patientId: '$patientId', visitId: '$visit.visit_id', ward: '$visit.ward', risk: '$visit.modelVisitSafe.checkup._checkup_risk_sign'}}}"})
+    public List<Object> getRiskPregnancy();
+
     @Aggregation(pipeline = {"{$match: {$and: [{user_id: ?0}, {'visit.visit_category': 'SAFE_MOTHERHOOD'}, {'visit.modelVisitSafe.termination._termination_complication': {$exists: true,$nin: ['NONE']}}]}}",
             "{$unwind: $visit}",
             "{$group: {_id: {patientId: '$patientId', visitId: '$visit.visit_id', ward: '$visit.ward', complication: '$visit.modelVisitSafe.termination._termination_complication'}}}",
             "{$count: 'total'}"})
     public Integer getComplicationDeliveryCountByChwId(String chwId);
+
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'SAFE_MOTHERHOOD', 'visit.modelVisitSafe.termination._termination_complication': {$exists: true,$nin: ['NONE']}}}",
+            "{$unwind: $visit}",
+            "{$group: {_id: {patientId: '$patientId', visitId: '$visit.visit_id', ward: '$visit.ward', complication: '$visit.modelVisitSafe.termination._termination_complication'}}}"})
+    public List<Object> getComplicationDelivery();
 
     @Aggregation(pipeline = {"{$match: {'visit.visit_followupdate_english': {$exists: true, $ne: null}, user_id: ?0}}",
                             "{$unwind: '$visit'}",
@@ -130,14 +191,9 @@ public interface VisitListsRepository extends MongoRepository<VisitLists, String
             "{$group: {_id: '$patientId'}}"})
     public List<Object> getFollowUpdate();
 
-    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'CHRONIC_DISEASE'}}",
-            "{$unwind: $visit}",
-            "{$match: {'visit.modelVisitChronic.cDisease.diseaseName': {$exists: true, $ne: null, $nin: ['NONE']}}}"})
-    public List<Object> getChronicPatients();
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'CHRONIC_DISEASE', 'visit.modelVisitChronic.cDisease.diseaseName': {$exists: true, $ne: null, $nin: ['NONE']}}}"})
+    public List<VisitLists> getChronicPatients();
 
-    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'CHRONIC_DISEASE', 'visit.modelVisitChronic.cRisk.riskName': {$exists: true, $ne: null, $nin: ['NONE']}}}",
-            "{$unwind: $visit}",
-            "{$match: {}}"})
-    public List<Object> getRiskPatients();
-
+    @Aggregation(pipeline = {"{$match: {'visit.visit_category': 'CHRONIC_DISEASE', 'visit.modelVisitChronic.cRisk.riskName': {$exists: true, $ne: null, $nin: ['NONE']}}}"})
+    public List<VisitLists> getRiskPatients();
 }

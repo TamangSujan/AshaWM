@@ -30,7 +30,7 @@ public interface ResidentsRepository extends MongoRepository<Residents, String> 
     public List<Residents> getLimitResidentByUser(int perPage, int currentPage, String user);
 
     @Aggregation(pipeline = {
-            "{$match: {'user': {$regex: //}}}",
+            "{$sort: {residentId: -1}}",
             "{$skip: ?1}",
             "{$limit: ?0}"})
     public List<Residents> getLimitResident(int perPage, int currentPage);

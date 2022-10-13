@@ -4,10 +4,13 @@ import com.ayata.urldatabase.model.bridge.*;
 import com.ayata.urldatabase.model.bridge.Response.*;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.model.token.Message;
+import com.ayata.urldatabase.repository.InfantVisitListsRepository;
 import com.ayata.urldatabase.repository.PatientRepository;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.repository.VisitListsRepository;
+import com.ayata.urldatabase.routes.web.misc.Category;
 import com.ayata.urldatabase.services.PatientService;
+import com.ayata.urldatabase.services.VisitService;
 import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +27,9 @@ public class URLPatient {
     private PatientRepository patientRepository;
     private PatientService patientService;
     private VisitListsRepository visitListsRepository;
+    private VisitService visitService;
     private UserRepository userRepository;
+    private InfantVisitListsRepository infantVisitListsRepository;
     @GetMapping("/Patient/getPatientList")
     public ResponseEntity<?> getPatientList(@RequestParam int perPage, @RequestParam int currentPage){
         if(currentPage<=0){
@@ -199,6 +204,123 @@ public class URLPatient {
             return ResponseEntity.status(200).body(response);
         }
         response.setMessage("List not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/trimesterphase/{id}")
+    public ResponseEntity<?> getTrimesterPhaseByChw(@PathVariable(value = "id")String id){
+        Object object = visitService.getTrimesterCount(id);
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("Trimester not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/trimesterphase")
+    public ResponseEntity<?> getPatientTrimester(){
+        Object object = visitService.getPatientTrimester();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("Trimester not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/newpregnancy")
+    public ResponseEntity<?> getNewPregnancyList(){
+        Object object = visitService.getNewChronicOrPregnancy(Category.SAFE_MOTHERHOOD);
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("New Pregnancy not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/newpregnancy/{id}")
+    public ResponseEntity<?> getNewPregnancyListById(@PathVariable(value = "id")String id){
+        Object object = visitService.getNewChronicOrPregnancyById(Category.SAFE_MOTHERHOOD, id);
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("New Pregnancy List not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/newncd")
+    public ResponseEntity<?> getNewChronicList(){
+        Object object = visitService.getNewChronicOrPregnancy(Category.CHRONIC_DISEASE);
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("New Chronic Patients not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/newinfant")
+    public ResponseEntity<?> getNewInfant(){
+        Object object = infantVisitListsRepository.getRiskInfants();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("New Risk Infants not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/newdelivery")
+    public ResponseEntity<?> getNewDelivery(){
+        Object object = visitService.getNewDelivery();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("New Delivery Patients not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/riskpregnancy")
+    public ResponseEntity<?> getRiskPregnancy(){
+        Object object = visitService.getRiskPregnancy();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("Risk Pregnancy not found!");
+        return ResponseEntity.status(400).body(response);
+    }
+
+    @GetMapping("/patient/complicationdelivery")
+    public ResponseEntity<?> getComplicationDelivery(){
+        Object object = visitService.getComplicationDelivery();
+        FinalResponse response = new FinalResponse("400", "Failure");
+        if(object!=null){
+            response.setStatusCode("200", "Success");
+            response.setDetails(object);
+            return ResponseEntity.status(200).body(response);
+        }
+        response.setMessage("Complication delivery not found!");
         return ResponseEntity.status(400).body(response);
     }
 }

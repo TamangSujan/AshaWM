@@ -32,5 +32,4 @@ public interface InfantsRepository extends MongoRepository<Infants, String> {
 
     @Aggregation(pipeline = "{$match: {'infantId': ?0}}")
     public Infants findInfantById(String id);
-
 }

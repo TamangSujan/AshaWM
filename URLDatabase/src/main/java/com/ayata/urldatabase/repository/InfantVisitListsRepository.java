@@ -13,4 +13,8 @@ public interface InfantVisitListsRepository extends MongoRepository<InfantVisitL
 
     @Aggregation(pipeline = {"{$match: {$and: [{'user_id': ?0},{'infantId' : ?1}]}}"})
     List<InfantVisitLists> getInfantVisitsList(String user, String infantId);
+
+    @Aggregation(pipeline = {"{$match: {'infantVisit.iRisk.does_have_risk': 'YES'}}",
+                            "{$group: {_id: {user_id: '$user_id', risk: '$infantVisit.iRisk.riskSigns', infantId: '$infantId'}}}"})
+    public List<Object> getRiskInfants();
 }

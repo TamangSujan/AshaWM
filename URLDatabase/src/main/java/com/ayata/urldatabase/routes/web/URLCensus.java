@@ -4,6 +4,7 @@ import com.ayata.urldatabase.model.bridge.*;
 import com.ayata.urldatabase.model.bridge.Response.CensusMapResponse;
 import com.ayata.urldatabase.model.bridge.Response.CensusWebResponse;
 import com.ayata.urldatabase.model.bridge.Response.CheckCensusResponse;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.Residents;
 import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.repository.PatientRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +55,19 @@ public class URLCensus {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getAllCensus(@RequestParam int perPage, @RequestParam int currentPage){
+    public ResponseEntity<?> getAllCensusParam(HttpServletRequest request){
+        Integer perPage = 10;
+        Integer currentPage = 1;
+        try {
+            String perPageString = request.getParameter("perPage");
+            String currentPageString = request.getParameter("currentPage");
+            if(perPageString!=null)
+                perPage = Integer.parseInt(perPageString);
+            if(currentPageString!=null)
+                currentPage = Integer.parseInt(currentPageString);
+        }catch (NullPointerException e){
+
+        }
         List<Residents> residentsList = residentsRepository.getLimitResident(perPage, (currentPage-1)*perPage);
         if(residentsList!=null && residentsList.size()>0){
             return ResponseEntity.status(HttpStatus.OK).body(new CensusWebResponse(perPage, currentPage, residentsRepository.getTotalResident(), residentsList));

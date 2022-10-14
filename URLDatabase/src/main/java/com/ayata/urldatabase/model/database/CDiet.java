@@ -1,10 +1,18 @@
 package com.ayata.urldatabase.model.database;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CDiet{
-    public int _visit_patient_detail_ward_ward_id;
-    public int chronic_diet_id;
-    public String green_veg;
-    public String less_salt;
-    public String patient_id;
-    public String reduced_oil;
-    public String visit_id;
+    private int _visit_patient_detail_ward_ward_id;
+    private int chronic_diet_id;
+    private String green_veg;
+    private String less_salt;
+    private String patient_id;
+    private String reduced_oil;
+    private String visit_id;
 }

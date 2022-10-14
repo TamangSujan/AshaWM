@@ -28,73 +28,70 @@ public class MobileURLInfant {
     private InfantVisitsRepository infantVisitsRepository;
     private InfantsRepository infantsRepository;
     private static Logger log = LogManager.getLogger(MobileURLInfant.class);
-    @PostMapping("/addInfantVisit")
-    public ResponseEntity<?> addVisit(@RequestBody InfantAppUserList appUserList){
-        log.info("REQUEST: Add Infant Visit");
-        List<Infants> infants = new ArrayList<>();
-        List<InfantVisitLists> visitLists = new ArrayList<>();
-        for(ModelInfant modelInfant: appUserList.getModelInfants()){
-            Infants infant = new Infants();
-            infant.setUser(appUserList.getAppUserId());
-            infant.setInfantAddedDate(modelInfant.getInfantAddedDate());
-            infant.setInfantAge(modelInfant.getInfantAge());
-            infant.setInfantAgeInDays(modelInfant.getInfantAgeInDays());
-            infant.setInfantAgeInMonth(modelInfant.getInfantAgeInMonth());
-            infant.setInfantDobEnglish(modelInfant.getInfantDobEnglish());
-            infant.setInfantDobNepali(modelInfant.getInfantDobNepali());
-            infant.setInfantFirstName(modelInfant.getInfantFirstName());
-            infant.setInfantFullName(modelInfant.getInfantFullName());
-            infant.setInfantGender(modelInfant.getInfantGender());
-            infant.setInfantHouseno(modelInfant.getInfantHouseno());
-            infant.setInfantId(modelInfant.getInfantId());
-            infant.setInfantLastName(modelInfant.getInfantLastName());
-            infant.setInfantPhone(modelInfant.getInfantPhone());
-            infant.setInfantVillagename(modelInfant.getInfantVillagename());
-            infant.setInfantmotherfirstname(modelInfant.getInfantmotherfirstname());
-            infant.setInfantmotherlastname(modelInfant.getInfantmotherlastname());
-            infant.setInfantwardno(modelInfant.getInfantwardno());
-            infants.add(infant);
 
+    /**
+     POST: Infant Visit Data
+     1. Extract infant, check if infant exists or not
+     2. If infant doesn't exist then create new infant else don't create
+     3. Extract InfantList and create a new visit list
+     4. Extract InfantVisit, check if visit exists or not for the same user
+     5. If InfantVisit doesn't exist then create new visit under the user else append modelVisit
+     6. Respond 200 If all works
+     */
+    @PostMapping("/addInfantVisit")
+    public ResponseEntity<?> addVisit(@RequestBody InfantAppUserList appUserList) {
+        log.info("REQUEST: Add Infant Visit");
+        if (appUserList != null) {
+            ModelInfant modelInfant = appUserList.getModelInfants().get(0);
+            //Extracting infant from modelInfant
+            Infants infant = infantsRepository.findInfantById(modelInfant.getInfantId());
+            if (infant == null) {
+                infant = new Infants();
+                infant.setUser(appUserList.getAppUserId());
+                infant.setInfantAddedDate(modelInfant.getInfantAddedDate());
+                infant.setInfantAge(modelInfant.getInfantAge());
+                infant.setInfantAgeInDays(modelInfant.getInfantAgeInDays());
+                infant.setInfantAgeInMonth(modelInfant.getInfantAgeInMonth());
+                infant.setInfantDobEnglish(modelInfant.getInfantDobEnglish());
+                infant.setInfantDobNepali(modelInfant.getInfantDobNepali());
+                infant.setInfantFirstName(modelInfant.getInfantFirstName());
+                infant.setInfantFullName(modelInfant.getInfantFullName());
+                infant.setInfantGender(modelInfant.getInfantGender());
+                infant.setInfantHouseno(modelInfant.getInfantHouseno());
+                infant.setInfantId(modelInfant.getInfantId());
+                infant.setInfantLastName(modelInfant.getInfantLastName());
+                infant.setInfantPhone(modelInfant.getInfantPhone());
+                infant.setInfantVillagename(modelInfant.getInfantVillagename());
+                infant.setInfantmotherfirstname(modelInfant.getInfantmotherfirstname());
+                infant.setInfantmotherlastname(modelInfant.getInfantmotherlastname());
+                infant.setInfantwardno(modelInfant.getInfantwardno());
+                infantsRepository.save(infant);
+            }
             InfantVisitLists visitList = new InfantVisitLists();
             visitList.setInfantVisit((ArrayList<InfantVisit>) modelInfant.getModelVisitList());
             visitList.setInfantId(infant.getInfantId());
             visitList.setUser_id(infant.getUser());
-            visitLists.add(visitList);
-        }
-        List<String> infantPhones = new ArrayList<>();
-        for(int i=0; i<infants.size(); i++){
-            infantPhones.add(infants.get(i).getInfantPhone());
-        }
-        List<Infants> matchedInfant = infantsRepository.matchedPhoneList(infantPhones);
-        for(Infants mpatient: matchedInfant){
-            for(Infants patient: infants){
-                if(mpatient.getInfantPhone().equals(patient.getInfantPhone())){
-                    patient.set_id(mpatient.get_id());
-                    break;
+            infantVisitListsRepository.save(visitList);
+
+            InfantVisits visit = infantVisitsRepository.getVisitByUserId(appUserList.getAppUserId());
+            if (visit == null) {
+                visit = new InfantVisits();
+                visit.setUser(appUserList.getAppUserId());
+                ArrayList<InfantAppUserList> appUserLists = new ArrayList<>();
+                appUserLists.add(appUserList);
+                visit.setAppUserList(appUserLists);
+            } else {
+                List<InfantVisit> list = visit.getAppUserList().get(0).getModelInfants().get(0).getModelVisitList();
+                for (InfantVisit modelVisit : modelInfant.getModelVisitList()) {
+                    list.add(modelVisit);
                 }
             }
+            infantVisitsRepository.save(visit);
+            log.info("SUCCESS: Adding Infant Visit");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Added"));
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Null Data"));
         }
-        /*
-        List<Infants> unmatchedInfant = infants.stream().
-                filter(infant->{
-                    for(Infants i: matchedInfant){
-                        if(infant.getInfantPhone().equals(i.getInfantPhone())){
-                            return true;
-                        }
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());*/
-        infantsRepository.saveAll(infants);
-        infantVisitListsRepository.saveAll(visitLists);
-        InfantVisits visit = new InfantVisits();
-        visit.setUser(appUserList.getAppUserId());
-        ArrayList<InfantAppUserList> appList = new ArrayList<>();
-        appList.add(appUserList);
-        visit.setAppUserList(appList);
-        infantVisitsRepository.save(visit);
-        log.info("SUCCESS: Adding Infant Visit");
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Added"));
     }
 
     @PostMapping("/checkInfantVisit")

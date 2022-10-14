@@ -21,7 +21,7 @@ public class WebAddStaffForm {
     private String _id;
     private Integer chw_age;
     private Integer chw_id;
-    private Integer chw_identifier;
+    private String chw_identifier;
     private String creator;
     private String chw_notes;
     private String chw_firstname;

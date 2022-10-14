@@ -9,6 +9,7 @@ import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.repository.*;
 import com.ayata.urldatabase.security.Jwt;
 import com.ayata.urldatabase.services.PatientService;
+import com.ayata.urldatabase.static_methods.Library;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,18 +86,20 @@ public class URLChw {
             }
             Date date = new Date();
             WebStaff webStaff = WebStaff.getWebStaff(form);
-
+            if(webStaff.getChw_id()==null){
+                webStaff.setChw_id(userRepository.getLastChwId()+1);
+            }
             if(form.getImage()!=null){
                 log.info("CHECK: Image Creation");
                 String imagePath = System.getProperty("user.dir")+"/Assets/Image/"+ date +form.getImage().getResource().getFilename();
-                createFile(form.getImage(), imagePath);
+                Library.createFile(form.getImage(), imagePath);
                 webStaff.setImage(imagePath);
             }
 
             if(form.getFile()!=null){
                 log.info("CHECK: File Creation");
                 String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date +form.getFile().getResource().getFilename();
-                createFile(form.getFile(), filePath);
+                Library.createFile(form.getFile(), filePath);
                 webStaff.setFile(filePath);
             }
 
@@ -134,13 +137,13 @@ public class URLChw {
             WebStaff webStaff = WebStaff.getWebStaff(form);
             if(form.getImage()!=null){
                 String imagePath = System.getProperty("user.dir")+"/Assets/Image/"+ date  +form.getImage().getResource().getFilename();
-                createFile(form.getImage(), imagePath);
+                Library.createFile(form.getImage(), imagePath);
                 webStaff.setImage(imagePath);
             }
 
             if(form.getFile()!=null){
                 String filePath = System.getProperty("user.dir")+"/Assets/File/"+ date +form.getFile().getResource().getFilename();
-                createFile(form.getFile(), filePath);
+                Library.createFile(form.getFile(), filePath);
                 webStaff.setFile(filePath);
             }
 
@@ -149,11 +152,11 @@ public class URLChw {
             Optional<WebStaff> webStaffUser;
             user = chwRepository.getByChwId(chw_id);
             if(user.isPresent()){
-                webStaff.setChw_identifier(chw_id);
+                webStaff.setChw_id(chw_id);
             }else{
                 webStaffUser = webChwRepository.getByChwId(chw_id);
                 if(webStaffUser.isPresent()){
-                    webStaff.setChw_identifier(chw_id);
+                    webStaff.setChw_id(chw_id);
                 }
             }
             webChwRepository.save(webStaff);
@@ -232,12 +235,5 @@ public class URLChw {
         }
         response.setMessage("Data not found!");
         return ResponseEntity.status(400).body(response);
-    }
-    public void createFile(MultipartFile file, String path) throws IOException {
-        File convertFile = new File(path);
-        convertFile.createNewFile();
-        FileOutputStream fout = new FileOutputStream(convertFile);
-        fout.write(file.getBytes());
-        fout.close();
     }
 }

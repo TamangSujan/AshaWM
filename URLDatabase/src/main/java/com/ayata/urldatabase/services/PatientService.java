@@ -26,7 +26,11 @@ public class PatientService {
 
     public PatientListResponseV2 getPatientShortDetails(int perPage, int currentPage){
         List<PatientShortDetails> patientShortDetails = patientRepository.patientShortDetails(perPage, currentPage);
-        PatientListResponseV2 response = new PatientListResponseV2(perPage, currentPage, patientRepository.getTotalPatient(), patientShortDetails);
+        Integer total = patientRepository.getTotalPatient();
+        if(total==null){
+            total = 0;
+        }
+        PatientListResponseV2 response = new PatientListResponseV2(perPage, currentPage, total, patientShortDetails);
         return response;
     }
 }

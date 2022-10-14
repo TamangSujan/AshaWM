@@ -28,7 +28,6 @@ public class MobileURLPatient {
         log.info("REQUEST: Check Visit");
         String user = Library.splitAndGetFirst(list.get(0), "_");
         List<Visits> visits = visitsRepository.getVisitsExceptGivenList(user, list);
-        //List<VisitLists> visitLists = visitListsRepository.getVisitsExceptGivenList(user, list);/*
         List<Object> patientLists = new ArrayList<>();
         for(Visits visit: visits){
             for(AppUserList appUserList: visit.getAppUserList()) {

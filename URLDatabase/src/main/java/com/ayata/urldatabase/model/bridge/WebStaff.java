@@ -2,6 +2,7 @@ package com.ayata.urldatabase.model.bridge;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class WebStaff {
     private String _id;
     private Integer chw_id;
     private Integer chw_age;
-    private Integer chw_identifier;
+    private String chw_identifier;
     private String creator;
     private String chw_notes;
     private String chw_name;
@@ -35,6 +36,7 @@ public class WebStaff {
     private Integer chw_doc_number;
     private String chw_gender;
     private String chw_contact;
+
     private String chw_alt_contact;
     private String phone;
     private String password;
@@ -60,6 +62,7 @@ public class WebStaff {
      */
     public static WebStaff getWebStaff(WebAddStaffForm webAddStaffForm){
         WebStaff webStaff = new WebStaff();
+        webStaff.chw_id = webAddStaffForm.getChw_id();
         webStaff.chw_age = webAddStaffForm.getChw_age();
         webStaff.chw_identifier = webAddStaffForm.getChw_identifier();
         webStaff.creator = webAddStaffForm.getCreator();

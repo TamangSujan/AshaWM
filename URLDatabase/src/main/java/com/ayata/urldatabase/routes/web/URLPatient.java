@@ -92,9 +92,18 @@ public class URLPatient {
     @GetMapping("/Patient/total")
     public ResponseEntity<?> getTotal() throws Exception {
         try {
-            int chronicCount = visitListsRepository.getCounts("CHRONIC_DISEASE");
-            int safeCount = visitListsRepository.getCounts("SAFE_MOTHERHOOD");
-            int total = patientRepository.getTotalPatient();
+            Integer chronicCount = visitListsRepository.getCounts("CHRONIC_DISEASE");
+            if(chronicCount==null){
+                chronicCount = 0;
+            }
+            Integer safeCount = visitListsRepository.getCounts("SAFE_MOTHERHOOD");
+            if(safeCount==null){
+                safeCount = 0;
+            }
+            Integer total = patientRepository.getTotalPatient();
+            if(total==null){
+                total = 0;
+            }
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "", new PatientCountResponse(chronicCount, safeCount, total)));
         }catch (Exception e){
             throw new Exception(e.getMessage());
@@ -135,7 +144,7 @@ public class URLPatient {
                         if(modelVisitList!=null){
                             if(modelVisitList.getVisit_category().equals("CHRONIC_DISEASE")){
                                 pastVisitDates.setVisit_category("Chronic Disease");
-                                pastVisitDates.setHealth_facility_name(modelVisitList.getModelVisitChronic().getCHealthFacility().health_facility_name);
+                                pastVisitDates.setHealth_facility_name(modelVisitList.getModelVisitChronic().getCHealthFacility().getHealth_facility_name());
                             }else if(modelVisitList.getVisit_category().equals("SAFE_MOTHERHOOD")){
                                 pastVisitDates.setVisit_category("Safe Motherhood");
                                 pastVisitDates.setHealth_facility_name(modelVisitList.getModelVisitSafe().getHealthDetail()._health_detail_visit_location);

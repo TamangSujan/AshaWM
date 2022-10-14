@@ -9,4 +9,8 @@ import java.util.List;
 public interface VisitsRepository extends MongoRepository<Visits, String> {
     @Aggregation(pipeline = {"{$match: {$and: [{'user': ?0},{'AppUserList.modelPatientList.patientId' :{$nin : ?1}}]}}"})
     List<Visits> getVisitsExceptGivenList(String user, List<String> list);
+
+    @Aggregation(pipeline = {"{$match: {user: ?0}}",
+                            "{$limit: 1}"})
+    Visits getVisitByUserId(String user);
 }

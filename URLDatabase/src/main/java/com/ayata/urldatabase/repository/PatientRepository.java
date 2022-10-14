@@ -44,8 +44,7 @@ public interface PatientRepository extends MongoRepository<Patients, String> {
             "{$group: {_id: '$patientAddedDate', count: {$sum: 1}}}"})
     public List<PatientChartList> getAllChart();
 
-    @Aggregation(pipeline = {"{$match: {'patientId': {$regex: //}}}",
-                            "{$group: {_id: 1, count: {$sum: 1}}}"})
+    @Aggregation(pipeline = {"{$count: 'total'}"})
     public Integer getTotalPatient();
 
     /* $dateFromString takes date object as a argument but found String on database

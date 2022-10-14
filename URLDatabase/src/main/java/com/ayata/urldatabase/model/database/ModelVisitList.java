@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class ModelVisitList{
     private EnteredDateTime entered_date_time;
     private ModelVisitSafe modelVisitSafe;
+    private ModelVisitChronic modelVisitChronic;
     private String patient_id;
     private String visit_category;
     private String visit_followupdate_english;
@@ -26,5 +27,4 @@ public class ModelVisitList{
     private double visit_longitude;
     private int ward;
     private boolean isSync;
-    private ModelVisitChronic modelVisitChronic;
 }

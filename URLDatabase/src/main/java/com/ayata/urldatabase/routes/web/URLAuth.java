@@ -3,12 +3,14 @@ package com.ayata.urldatabase.routes.web;
 import com.ayata.urldatabase.controller.AuthController;
 import com.ayata.urldatabase.model.bridge.*;
 import com.ayata.urldatabase.model.bridge.Response.DoctorResponse;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.Doctors;
 import com.ayata.urldatabase.model.database.Users;
 import com.ayata.urldatabase.model.token.UsernamePassword;
 import com.ayata.urldatabase.repository.DoctorRepository;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.security.Jwt;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,31 +30,41 @@ public class URLAuth {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private DoctorRepository doctorRepository;
-    private static Logger log = LogManager.getLogger(URLAuth.class);
     private BCryptPasswordEncoder encoder;
     private AuthController authController;
+    private static final Logger log = LogManager.getLogger(URLAuth.class);
+
     @PostMapping("/login")
-    public ResponseEntity loginUser(@RequestBody UsernamePassword usernamePassword){
+    public ResponseEntity<?> loginUser(@RequestBody UsernamePassword usernamePassword){
         log.info("REQUEST: Login");
         if(usernamePassword.getPhone().equals("") || usernamePassword.getPassword().equals("")){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Field Should Not Be Empty"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Field shouldn't be empty!", null, null));
         }
         Optional<Doctors> doctor = doctorRepository.findDoctorByPhone(usernamePassword.getPhone());
-        if(!doctor.isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "User Not Found"));
+        if(doctor.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "User not found!", null, null));
         }
         if(encoder.matches(usernamePassword.getPassword(), doctor.get().getPassword())){
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernamePassword.getPhone(), usernamePassword.getPassword()));
             String access_token = Jwt.getAccessToken(usernamePassword.getPhone(), 15, "/api/v2/web/login", false);
-            //TODO: IP hasn't been returnedDoc
             DoctorResponse doctorResponse = new DoctorResponse(doctor.get().getDoc_id(), doctor.get().getName(), doctor.get().getPhone(), access_token, "");
             log.info("SUCCESS: Login");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Doctor logged in successfully", doctorResponse));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Doctor logged in successfully!", null, doctorResponse));
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Invalid Credentials"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Invalid credentials!"));
         }
     }
 
+    /**
+     * Register doctor
+     * @author
+     *      Ayata Inc.
+     * @RequestBody
+     *      String phone, String password
+     * @return
+     *      200 Success Doctor registered successfully,
+     *      400 Failure Phone already registered!
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UsernamePassword usernamePassword){
         log.info("REQUEST: Register");
@@ -68,7 +80,7 @@ public class URLAuth {
             doc.setDoc_id(id);
             doctorRepository.save(doc);
             log.info("SUCCESS: Doctor registered!");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "success", "Doctor registered successfully!", "{}"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Doctor registered successfully!"));
         }
     }
 
@@ -76,9 +88,9 @@ public class URLAuth {
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPassword user){
         String message = authController.forgotPassword(user.getUsername(), user.getPassword(), user.getConfirmPassword());
         if(!message.equals("ok")){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Password Changed!"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Password successfully changed!"));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "Failure", message));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, message));
     }
 
     @PostMapping("/updateProfile")
@@ -92,7 +104,7 @@ public class URLAuth {
             throw new IllegalStateException("User doesn't exist!");
         }
         log.info("SUCCESS: Profile Updated!");
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Successfully Updated!"));
+        return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Successfully updated!"));
     }
 
     @PostMapping("/deleteUser")
@@ -103,7 +115,7 @@ public class URLAuth {
         }else{
             throw new IllegalStateException("User doesn't exists!");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "success", "Successfully Deleted!"));
+        return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Successfully deleted!"));
     }
 
 }

@@ -30,7 +30,6 @@ public class PatientService {
         if(total==null){
             total = 0;
         }
-        PatientListResponseV2 response = new PatientListResponseV2(perPage, currentPage, total, patientShortDetails);
-        return response;
+        return new PatientListResponseV2(perPage, currentPage, total, patientShortDetails);
     }
 }

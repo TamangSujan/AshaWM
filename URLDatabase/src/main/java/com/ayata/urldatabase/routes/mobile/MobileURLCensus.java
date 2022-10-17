@@ -1,11 +1,12 @@
 package com.ayata.urldatabase.routes.mobile;
 
 import com.ayata.urldatabase.model.bridge.CensusRoot;
-import com.ayata.urldatabase.model.bridge.ResponseMessage;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.Residents;
 import com.ayata.urldatabase.model.bridge.Response.CheckCensusResponse;
 import com.ayata.urldatabase.repository.ResidentsRepository;
-import com.ayata.urldatabase.static_methods.Library;
+import com.ayata.urldatabase.static_files.Library;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +25,7 @@ import java.util.List;
 @RequestMapping("/api/v2/mobile")
 public class MobileURLCensus {
     private ResidentsRepository residentsRepository;
-    private static Logger log = LogManager.getLogger(MobileURLCensus.class);
+    private static final Logger log = LogManager.getLogger(MobileURLCensus.class);
 
     @PostMapping("/checkCensus")
     public ResponseEntity<?> checkMobileCensus(@RequestBody List<String> residents){
@@ -39,9 +40,8 @@ public class MobileURLCensus {
             log.info("SUCCESS: Sending Census");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }catch (RuntimeException ex){
-            System.out.println(ex.getCause());
             log.error("ERROR: Check census!");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("400", "failure", ex.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FinalResponse(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()));
         }
     }
 
@@ -51,11 +51,11 @@ public class MobileURLCensus {
         Residents checkResident = residentsRepository.findByResidentId(censusRoot.censusList.get(0).getResident_id());
         if(checkResident!=null){
             log.error("ERROR: Add Census - Resident Exists");
-            return new ResponseEntity(new ResponseMessage("403", "Failure", "Resident Exists"), HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Resident Exists"));
         }else{
             log.info("SUCCESS: Adding Census");
             residentsRepository.save(censusRoot.censusList.get(0).getNewResident());
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Resident Added"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Resident Added"));
         }
     }
 }

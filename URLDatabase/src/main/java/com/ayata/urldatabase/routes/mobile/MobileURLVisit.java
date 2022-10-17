@@ -1,10 +1,15 @@
 package com.ayata.urldatabase.routes.mobile;
 
-import com.ayata.urldatabase.model.bridge.ResponseMessage;
+import com.ayata.urldatabase.model.bridge.Response.CheckVisitResponse;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.repository.PatientRepository;
 import com.ayata.urldatabase.repository.VisitListsRepository;
 import com.ayata.urldatabase.repository.VisitsRepository;
+import com.ayata.urldatabase.static_files.Library;
+import com.ayata.urldatabase.static_files.StatusCode;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -13,10 +18,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
@@ -28,22 +33,31 @@ public class MobileURLVisit {
     private PatientRepository patientRepository;
     private VisitsRepository visitsRepository;
     private VisitListsRepository visitListsRepository;
-    private static Logger log = LogManager.getLogger(MobileURLVisit.class);
+    private static final Logger log = LogManager.getLogger(MobileURLVisit.class);
 
-    /**
-        POST: Patient Visit Data
-        1. Extract patient, check if patient exists or not
-        2. If patient doesn't exist then create new patient else don't create
-        3. Extract VisitList and create a new visit list
-        4. Extract Visit, check if visit exists or not for the same user
-        5. If visit doesn't exist then create new visit under the user else append modelPatient
-        6. Respond 200 If all works
-     */
+    @PostMapping("/checkVisit")
+    public ResponseEntity<?> checkVisits(@RequestBody List<String> list){
+        log.info("REQUEST: Check Visit");
+        String user = Library.splitAndGetFirst(list.get(0), "_");
+        List<Visits> visits = visitsRepository.getVisitsExceptGivenList(user, list);
+        List<Object> patientLists = new ArrayList<>();
+        for(Visits visit: visits){
+            for(AppUserList appUserList: visit.getAppUserList()) {
+                patientLists.addAll(appUserList.getModelPatientList());
+            }
+        }
+        CheckVisitResponse response = new CheckVisitResponse(user, patientLists);
+        log.info("SUCCESS: Sending Visits");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PostMapping(value = "/addVisit")
     public ResponseEntity<?> addVisit(HttpServletRequest request) throws IOException {
         log.info("REQUEST: Add Visit");
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        System.out.println(request.getParameter("json"));
         AppUserList appUserList = objectMapper.readValue(request.getParameter("json"), AppUserList.class);
         if(appUserList!=null) {
             ModelPatientList modelPatientList = appUserList.getModelPatientList().get(0);
@@ -88,18 +102,13 @@ public class MobileURLVisit {
                 visit.setAppUserList(appUserLists);
             }else{
                 List<ModelVisitList> list = visit.getAppUserList().get(0).getModelPatientList().get(0).getModelVisitList();
-                for (ModelVisitList modelVisit : modelPatientList.getModelVisitList()) {
-                    if(modelVisit.getModelVisitChronic()!=null){
-                        System.out.println(modelVisit.getModelVisitChronic());
-                    }
-                    list.add(modelVisit);
-                }
+                list.addAll(modelPatientList.getModelVisitList());
             }
             visitsRepository.save(visit);
             log.info("SUCCESS: Adding Visit");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Added"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Added"));
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Null Data"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Null Data"));
         }
     }
 }

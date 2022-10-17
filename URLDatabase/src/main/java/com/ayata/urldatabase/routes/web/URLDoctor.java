@@ -1,14 +1,14 @@
 package com.ayata.urldatabase.routes.web;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ayata.urldatabase.model.bridge.*;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.Doctors;
 import com.ayata.urldatabase.repository.DoctorRepository;
 import com.ayata.urldatabase.security.Jwt;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,18 +31,18 @@ public class URLDoctor {
         log.info("REQUEST: Doctor details");
         String phone = Jwt.getPhone(request);
         Optional<Doctors> doctorOptional = doctorRepository.findDoctorByPhone(phone);
-        Doctors doctor = doctorOptional.get();
-        if(doctor!=null){
+        if(doctorOptional.isPresent()){
+            Doctors doctor = doctorOptional.get();
             doctor.setName(details.getName());
             doctor.setBio(details.getBio());
             doctor.setAddress(details.getAddress());
             doctorRepository.save(doctor);
             DoctorBasicDetails basicDetails = new DoctorBasicDetails(doctor.getDoc_id(), doctor.getName(), doctor.getPhone(), doctor.getAddress(), doctor.getBio());
             log.info("SUCCESS: Doctor updated successfully!");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Details updated successfully", basicDetails));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Details updated successfully", null, basicDetails));
         }
         log.error("ERROR: Doctor update error!");
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(400, "Failure", "Error on updating!", ""));
+        return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.BAD_REQUEST, "Error on updating!"));
     }
 
     @GetMapping("/details")
@@ -50,11 +50,14 @@ public class URLDoctor {
         log.info("REQUEST: Doctor details");
         String phone = Jwt.getPhone(request);
         Optional<Doctors> doctorOptional = doctorRepository.findDoctorByPhone(phone);
-        Doctors doctor = doctorOptional.get();
-        DoctorBasicDetails basicDetails = new DoctorBasicDetails(doctor.getDoc_id(), doctor.getName(), doctor.getPhone(), doctor.getAddress(), doctor.getBio());
-        log.info("SUCCESS: Doctor details fetched successfully!");
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Details updated successfully", basicDetails));
-   }
+        if(doctorOptional.isPresent()) {
+            Doctors doctor = doctorOptional.get();
+            DoctorBasicDetails basicDetails = new DoctorBasicDetails(doctor.getDoc_id(), doctor.getName(), doctor.getPhone(), doctor.getAddress(), doctor.getBio());
+            log.info("SUCCESS: Doctor details fetched successfully!");
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Details updated successfully", null, basicDetails));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST,"Error while updating doctor"));
+    }
 
    @PutMapping("/changepassword")
     public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody ForgotPasswordWeb forgotPassword){
@@ -66,9 +69,9 @@ public class URLDoctor {
                 doctor.setPassword(encoder.encode(forgotPassword.getNew_password()));
                 doctorRepository.save(doctor);
                 DoctorBasicDetails basicDetails = new DoctorBasicDetails(doctor.getDoc_id(), doctor.getName(), doctor.getPhone(), doctor.getAddress(), doctor.getBio());
-                return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Password updated successfully.", basicDetails));
+                return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Password updated successfully.", null, basicDetails));
             }
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure", "Error on updating password", ""));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FinalResponse(StatusCode.INTERNAL_SERVER_ERROR, "Error on updating password"));
    }
 }

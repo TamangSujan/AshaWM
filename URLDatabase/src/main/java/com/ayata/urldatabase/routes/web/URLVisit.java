@@ -3,7 +3,9 @@ package com.ayata.urldatabase.routes.web;
 import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.VisitLists;
 import com.ayata.urldatabase.repository.VisitListsRepository;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,39 +22,27 @@ public class URLVisit {
     @GetMapping("/followupdate")
     public ResponseEntity<?> getFollowUpdate(){
         Object list = visitListsRepository.getFollowUpdate();
-        FinalResponse response = new FinalResponse("400", "Failure");
         if(list!=null){
-            response.setStatusCode("200", "Success");
-            response.setDetails(list);
-            return ResponseEntity.status(200).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, list));
         }
-        response.setMessage("List not found!");
-        return ResponseEntity.status(400).body(response);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "List not found!"));
     }
 
     @GetMapping("/chronicdisease")
     public ResponseEntity<?> getChronicPatient(){
         Object list = visitListsRepository.getChronicPatients();
-        FinalResponse response = new FinalResponse("400", "Failure");
         if(list!=null){
-            response.setStatusCode("200", "Success");
-            response.setDetails(list);
-            return ResponseEntity.status(200).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, list));
         }
-        response.setMessage("List not found!");
-        return ResponseEntity.status(400).body(response);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "List not found!"));
     }
 
     @GetMapping("/riskncd")
     public ResponseEntity<?> getRiskPatient(){
         Object list = visitListsRepository.getRiskPatients();
-        FinalResponse response = new FinalResponse("400", "Failure");
         if(list!=null){
-            response.setStatusCode("200", "Success");
-            response.setDetails(list);
-            return ResponseEntity.status(200).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, list));
         }
-        response.setMessage("List not found!");
-        return ResponseEntity.status(400).body(response);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "List not found!"));
     }
 }

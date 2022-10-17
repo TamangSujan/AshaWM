@@ -1,4 +1,4 @@
-package com.ayata.urldatabase.static_methods;
+package com.ayata.urldatabase.static_files;
 
 import org.springframework.web.multipart.MultipartFile;
 

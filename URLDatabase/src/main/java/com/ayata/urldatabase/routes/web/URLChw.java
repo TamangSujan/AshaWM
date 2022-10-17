@@ -5,11 +5,11 @@ import com.ayata.urldatabase.model.bridge.Response.CIPResponse;
 import com.ayata.urldatabase.model.bridge.Response.ChwListResponse;
 import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.*;
-import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.repository.*;
 import com.ayata.urldatabase.security.Jwt;
 import com.ayata.urldatabase.services.PatientService;
-import com.ayata.urldatabase.static_methods.Library;
+import com.ayata.urldatabase.static_files.Library;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,14 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +42,7 @@ public class URLChw {
     private PatientService patientService;
 
     private BCryptPasswordEncoder encoder;
-    private static Logger log = LogManager.getLogger(URLChw.class);
+    private static final Logger log = LogManager.getLogger(URLChw.class);
     @GetMapping("/CHW/get")
     public ResponseEntity<?> getChwList(@RequestParam int perPage, @RequestParam int currentPage){
         if(currentPage<=0){
@@ -58,13 +53,13 @@ public class URLChw {
         if(list.size()>0){
             return ResponseEntity.status(HttpStatus.OK).body(new ChwListResponse(perPage, currentPage, chwRepository.totalUser(), list));
         }else{
-            return ResponseEntity.status(HttpStatus.OK).body(new Message("chwList not found in database."));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "chwList not found on database!"));
         }
     }
 
     @GetMapping("/CHW/total")
     public ResponseEntity<?> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "", chwRepository.totalUser()));
+        return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, chwRepository.totalUser()));
     }
 
     @PostMapping(value = "/CHW/create", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -76,13 +71,13 @@ public class URLChw {
             log.info("CHECK: Doctor Presented");
             Optional<Users> user = chwRepository.getByPhone(form.getPhone());
             if(user.isPresent()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure", "Phone already exists!",""));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Phone already exists!"));
             }
             if(form.getPhone().equals("") || form.getPassword().equals("")){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure", "Fields shouldn't be empty!",""));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Fields shouldn't be empty!"));
             }
             if(!form.getPhone().startsWith("9") || form.getPhone().length()!=10){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure" , "Phone number is invalid!", ""));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Phone number is invalid!"));
             }
             Date date = new Date();
             WebStaff webStaff = WebStaff.getWebStaff(form);
@@ -107,7 +102,7 @@ public class URLChw {
 
             webChwRepository.save(webStaff);
             log.info("CHECK: File Saved");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Staff successfully created!", ""));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Staff successfully created!"));
         }
         throw new IllegalStateException("Invalid Credentials");
     }
@@ -115,10 +110,8 @@ public class URLChw {
     @GetMapping("/CHW/details/{chw_id}")
     public ResponseEntity<?> getChw(@PathVariable(value = "chw_id") Integer chw_id){
         Optional<WebStaff> webStaff = webChwRepository.getByChwId(chw_id);
-        if(webStaff.isPresent()){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "", webStaff.get()));
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure", "User not found!", ""));
+        return webStaff.map(staff -> ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, staff)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "User not found!")));
     }
 
 
@@ -128,10 +121,10 @@ public class URLChw {
         Optional<Doctors> doc = doctorRepository.findDoctorByPhone(phone);
         if(doc.isPresent()){
             if(form.getPhone().equals("") || form.getPassword().equals("")){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure", "Fields shouldn't be empty!",""));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Fields shouldn't be empty!"));
             }
             if(!form.getPhone().startsWith("9") || form.getPhone().length()!=10){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDetails(400, "Failure" , "Phone number is invalid!", ""));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST , "Phone number is invalid!"));
             }
             Date date = new Date();
             WebStaff webStaff = WebStaff.getWebStaff(form);
@@ -160,7 +153,7 @@ public class URLChw {
                 }
             }
             webChwRepository.save(webStaff);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDetails(200, "Success", "Staff successfully created!", ""));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Staff successfully created!"));
         }
         throw new IllegalStateException("Invalid Credentials");
     }
@@ -219,21 +212,17 @@ public class URLChw {
         Users user = userRepository.findByChwId(chwId);
         if(user!=null){
             userRepository.delete(user);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "User deleted succesfully!"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "User deleted succesfully!"));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "User not found!"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "User not found!"));
     }
 
     @GetMapping("/chw/nameofCHW")
     public ResponseEntity<?> getNamesofCHW(){
         List<String> nameList = userRepository.getCHWNameList();
-        FinalResponse response = new FinalResponse("400", "Failure");
         if(nameList!=null){
-            response.setStatusCode("200", "Success");
-            response.setDetails(nameList);
-            return ResponseEntity.status(200).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, nameList));
         }
-        response.setMessage("Data not found!");
-        return ResponseEntity.status(400).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.BAD_REQUEST, "Data not found!"));
     }
 }

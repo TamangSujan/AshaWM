@@ -9,7 +9,8 @@ import com.ayata.urldatabase.repository.InfantVisitListsRepository;
 import com.ayata.urldatabase.repository.InfantsRepository;
 import com.ayata.urldatabase.repository.UserRepository;
 import com.ayata.urldatabase.services.InfantService;
-import com.ayata.urldatabase.static_methods.Library;
+import com.ayata.urldatabase.static_files.Library;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,12 @@ public class URLInfant {
         if( list.size()>0) {
             return ResponseEntity.status(HttpStatus.OK).body(new InfantListResponse(perPage, currentPage, infantsRepository.getTotalInfant(), list));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new Message("Patient List not found in database."));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Patient List not found in database."));
     }
 
     @GetMapping("/Infant/total")
     public ResponseEntity<?> totalInfant(){
-        return ResponseEntity.status(200).body(new ResponseDetails(200, "Success", "", infantsRepository.getTotalInfant()));
+        return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, infantsRepository.getTotalInfant()));
     }
 
     @GetMapping("/Infant/details/{id}")
@@ -90,9 +91,9 @@ public class URLInfant {
                 infantDetails.setNextVisitDates(nextVisitDatesList);
                 infantDetails.setInfantVisitLists(visitLists);
             }
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseData("200", "Success", infantDetails));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, infantDetails, null));
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "No patient found!"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "No patient found!"));
         }
     }
 
@@ -102,9 +103,9 @@ public class URLInfant {
         if(inf!=null) {
             infant.set_id(inf.get_id());
             infantsRepository.save(infant);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseData("200", "Success", infant));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, infant, null));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new Message("Infant not found in database."));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Infant not found in database."));
     }
 
     @DeleteMapping("/Infant/delete/{id}")
@@ -112,22 +113,17 @@ public class URLInfant {
         Infants infant = infantsRepository.findInfantById(id);
         if(infant!=null) {
             infantsRepository.delete(infant);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Infant deleted successfully!"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Infant deleted successfully!"));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new Message("Infant not found in database."));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Infant not found in database."));
     }
 
     @GetMapping("/infant/riskinfant")
     public ResponseEntity<?> getRiskInfant(){
         Object object = infantService.getRiskInfants();
-        FinalResponse response = new FinalResponse("400", "Failure");
         if(object!=null) {
-            response.setStatusCode("200", "Success");
-            response.setDetails(object);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, null, object));
         }
-        response.setMessage("Data not found!");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Risk infant not found in database!"));
     }
 }

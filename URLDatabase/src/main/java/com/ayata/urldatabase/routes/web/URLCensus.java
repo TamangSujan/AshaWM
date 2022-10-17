@@ -9,7 +9,8 @@ import com.ayata.urldatabase.model.database.Residents;
 import com.ayata.urldatabase.model.token.Message;
 import com.ayata.urldatabase.repository.PatientRepository;
 import com.ayata.urldatabase.repository.ResidentsRepository;
-import com.ayata.urldatabase.static_methods.Library;
+import com.ayata.urldatabase.static_files.Library;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +30,17 @@ public class URLCensus {
     public ResponseEntity<?> addCensus(@RequestBody Residents residents){
         Residents checkResident = residentsRepository.findByResidentId(residents.getResidentId());
         if(checkResident!=null){
-            return new ResponseEntity(new ResponseMessage("403", "Failure", "Resident Exists"), HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Resident Exists"));
         }else{
             residentsRepository.save(residents);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Resident Added"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Resident Added"));
         }
     }
 
     @PostMapping("/checkCensus")
     public ResponseEntity<?> checkCensus(@RequestBody List<String> residents) {
         if (residents.isEmpty()) {
-            return new ResponseEntity(new ResponseMessage("403", "Failure", "Empty Resident's List "), HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Empty Resident's List "));
         }
         String appUserId = Library.splitAndGetFirst(residents.get(0), "_");
         List<Residents> checkResident = residentsRepository.findAllByUserIdExceptGivenList(appUserId, residents);
@@ -48,34 +49,30 @@ public class URLCensus {
             response.getCensusList().add(resident.getResidentOnly());
         }
         if (checkResident.size() > 0) {
-            return new ResponseEntity(response, HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(new Message("No New Data"));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "No data found in database!"));
         }
     }
 
     @GetMapping("/get")
     public ResponseEntity<?> getAllCensusParam(HttpServletRequest request){
-        Integer perPage = 10;
-        Integer currentPage = 1;
-        try {
-            String perPageString = request.getParameter("perPage");
-            String currentPageString = request.getParameter("currentPage");
-            if(perPageString!=null)
-                perPage = Integer.parseInt(perPageString);
-            if(currentPageString!=null)
-                currentPage = Integer.parseInt(currentPageString);
-        }catch (NullPointerException e){
-
-        }
+        int perPage = 10;
+        int currentPage = 1;
+        String perPageString = request.getParameter("perPage");
+        String currentPageString = request.getParameter("currentPage");
+        if(perPageString!=null)
+            perPage = Integer.parseInt(perPageString);
+        if(currentPageString!=null)
+            currentPage = Integer.parseInt(currentPageString);
         List<Residents> residentsList = residentsRepository.getLimitResident(perPage, (currentPage-1)*perPage);
         if(residentsList!=null && residentsList.size()>0){
             return ResponseEntity.status(HttpStatus.OK).body(new CensusWebResponse(perPage, currentPage, residentsRepository.getTotalResident(), residentsList));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Census not found!"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FinalResponse(StatusCode.BAD_REQUEST, "Census not found!"));
     }
 
-    //TODO: getcensusfhir
+    //TODO: getcensusfhir - No Idea About CensusFhir
     /*
     @GetMapping("/getcensusfhir")
     public ResponseEntity<?> getCensusfhir(){
@@ -86,9 +83,9 @@ public class URLCensus {
     public ResponseEntity<?> getDetails(@PathVariable(value = "id") String id){
         Residents resident = residentsRepository.findByResidentId(id);
         if(resident!=null){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseData("200", "Success", resident));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, null, resident, null));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Resident not found!"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Resident not found!"));
     }
 
     @GetMapping("/location")
@@ -97,7 +94,7 @@ public class URLCensus {
         if(censusMap!=null){
             return ResponseEntity.status(HttpStatus.OK).body(new CensusMapResponse(residentsRepository.getTotalResident(), censusMap));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Resident not found!"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Resident not found!"));
     }
 
     @GetMapping("/chart")
@@ -123,9 +120,9 @@ public class URLCensus {
         if(res!=null){
             resident.set_id(res.get_id());
             residentsRepository.save(resident);
-            return ResponseEntity.status(200).body(new ResponseMessage("200", "Success", "Census information updated successfully!"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Census information updated successfully!"));
         }
-        return ResponseEntity.status(400).body(new ResponseMessage("400", "Failure", "Census not found!"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Census not found!"));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -133,8 +130,8 @@ public class URLCensus {
         Residents resident = residentsRepository.findByResidentId(id);
         if(resident!=null){
             residentsRepository.delete(resident);
-            return ResponseEntity.status(200).body(new ResponseMessage("200", "Success", "Census deleted successfully!"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Census deleted successfully!"));
         }
-        return ResponseEntity.status(400).body(new ResponseMessage("400", "Failure", "Census not found!"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Census not found!"));
     }
 }

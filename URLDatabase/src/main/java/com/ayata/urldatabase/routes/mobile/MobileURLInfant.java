@@ -1,12 +1,13 @@
 package com.ayata.urldatabase.routes.mobile;
 
 import com.ayata.urldatabase.model.bridge.Response.CheckInfantResponse;
-import com.ayata.urldatabase.model.bridge.ResponseMessage;
+import com.ayata.urldatabase.model.bridge.Response.FinalResponse;
 import com.ayata.urldatabase.model.database.*;
 import com.ayata.urldatabase.repository.InfantVisitListsRepository;
 import com.ayata.urldatabase.repository.InfantVisitsRepository;
 import com.ayata.urldatabase.repository.InfantsRepository;
-import com.ayata.urldatabase.static_methods.Library;
+import com.ayata.urldatabase.static_files.Library;
+import com.ayata.urldatabase.static_files.StatusCode;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,17 +28,8 @@ public class MobileURLInfant {
     private InfantVisitListsRepository infantVisitListsRepository;
     private InfantVisitsRepository infantVisitsRepository;
     private InfantsRepository infantsRepository;
-    private static Logger log = LogManager.getLogger(MobileURLInfant.class);
+    private static final Logger log = LogManager.getLogger(MobileURLInfant.class);
 
-    /**
-     POST: Infant Visit Data
-     1. Extract infant, check if infant exists or not
-     2. If infant doesn't exist then create new infant else don't create
-     3. Extract InfantList and create a new visit list
-     4. Extract InfantVisit, check if visit exists or not for the same user
-     5. If InfantVisit doesn't exist then create new visit under the user else append modelVisit
-     6. Respond 200 If all works
-     */
     @PostMapping("/addInfantVisit")
     public ResponseEntity<?> addVisit(@RequestBody InfantAppUserList appUserList) {
         log.info("REQUEST: Add Infant Visit");
@@ -82,15 +74,13 @@ public class MobileURLInfant {
                 visit.setAppUserList(appUserLists);
             } else {
                 List<InfantVisit> list = visit.getAppUserList().get(0).getModelInfants().get(0).getModelVisitList();
-                for (InfantVisit modelVisit : modelInfant.getModelVisitList()) {
-                    list.add(modelVisit);
-                }
+                list.addAll(modelInfant.getModelVisitList());
             }
             infantVisitsRepository.save(visit);
             log.info("SUCCESS: Adding Infant Visit");
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("200", "Success", "Added"));
+            return ResponseEntity.status(HttpStatus.OK).body(new FinalResponse(StatusCode.OK, "Added"));
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("400", "Failure", "Null Data"));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new FinalResponse(StatusCode.NO_CONTENT, "Infant Data not found on database!"));
         }
     }
 

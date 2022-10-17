@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FinalResponse {
@@ -16,13 +15,17 @@ public class FinalResponse {
     private Object data;
     private Object details;
 
-    public FinalResponse(String code, String status){
-        this.code = code;
-        this.status = status;
+    public FinalResponse(String[] statusCode, String message){
+        this.code = statusCode[0];
+        this.status = statusCode[1];
+        this.message = message;
     }
 
-    public void setStatusCode(String code, String status){
-        this.code = code;
-        this.status = status;
+    public FinalResponse(String[] statusCode, String message, Object data, Object details){
+        this.code = statusCode[0];
+        this.status = statusCode[1];
+        this.message = message;
+        this.data = data;
+        this.details = details;
     }
 }
